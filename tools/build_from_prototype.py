@@ -1,4 +1,4 @@
-"""Turns the Ritmo prototype (single HTML, localStorage + sample data) into the
+"""Turns the Habit prototype (single HTML, localStorage + sample data) into the
 connected app (Supabase via cloud.js):
 
     python3 tools/build_from_prototype.py tools/prototype.html index.html
@@ -21,7 +21,7 @@ def cut(start, end):
     s = s[:i] + s[j:]
 
 # ---------- document shell + PWA ----------
-rep('<title>Ritmo</title>', '''<!doctype html>
+rep('<title>Habit</title>', '''<!doctype html>
 <html lang="es">
 <head>
 <meta charset="utf-8">
@@ -34,14 +34,14 @@ rep('<title>Ritmo</title>', '''<!doctype html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Ritmo">
-<title>Ritmo</title>''')
+<meta name="apple-mobile-web-app-title" content="Habit">
+<title>Habit</title>''')
 i = s.index('</style>') + len('</style>')
 s = s[:i] + '\n</head>\n<body>' + s[i:]
 s = s.rstrip() + '\n</body>\n</html>\n'
 
 # ---------- auth + splash screens (markup + css) ----------
-rep('<div class="app">', '''<div class="splash" id="splash" aria-hidden="true"><div class="splash-mark">Ritmo</div></div>
+rep('<div class="app">', '''<div class="splash" id="splash" aria-hidden="true"><div class="splash-mark">Habit</div></div>
 <div class="auth" id="auth" hidden></div>
 <div class="app">''')
 rep('</style>', '''
@@ -166,7 +166,7 @@ rep('      <p class="cel-fr">${esc(fr)}</p>', "      ${fr ? `<p class=\"cel-fr\"
 rep("  freezePast(); withState(friend, freezePast); save(); render();\n  toast('Nuevo día. El de ayer quedó guardado.');",
     "  freezePast(); friends.forEach(f => withState(f, freezePast)); save(); render();\n  toast('Nuevo día. El de ayer quedó guardado.');")
 
-rep("    $('eyebrow').textContent = 'Ritmo · para ti y tu amigo';", "    $('eyebrow').textContent = friends.length === 1 ? `Ritmo · con ${friendName()}` : friends.length ? 'Ritmo · con tus amigos' : 'Ritmo · para ti y tu amigo';")
+rep("    $('eyebrow').textContent = 'Habit · para ti y tu amigo';", "    $('eyebrow').textContent = friends.length === 1 ? `Habit · con ${friendName()}` : friends.length ? 'Habit · con tus amigos' : 'Habit · para ti y tu amigo';")
 
 # ---------- profile: account instead of sample reset ----------
 rep('''      ${state.sample ? `<div class="field"><span class="lbl">Datos de ejemplo</span>
@@ -219,8 +219,8 @@ function authFlow(){
     try { email = localStorage.getItem('ritmo-email') || ''; } catch(e) {}
     const invited = (() => { try { return !!localStorage.getItem(INVITE_KEY); } catch(e) { return false; } })();
     const stepEmail = () => {
-      const a = authScreen(`<div class="auth-brand">Ritmo</div>
-        <h1>${invited ? 'Te invitaron a Ritmo' : 'Tus hábitos, con tu amigo.'}</h1>
+      const a = authScreen(`<div class="auth-brand">Habit</div>
+        <h1>${invited ? 'Te invitaron a Habit' : 'Tus hábitos, con tus amigos.'}</h1>
         <p>${invited ? 'Entra con tu correo y quedarán conectados.' : 'Marca tu día, sube la montaña y mantengan la racha juntos.'}</p>
         <div class="field"><label class="lbl" for="au-email">Tu correo</label>
           <input id="au-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="tu@correo.com" value="${esc(email)}" enterkeyhint="send"></div>
@@ -239,7 +239,7 @@ function authFlow(){
       setTimeout(() => inp.focus(), 350);
     };
     const stepCode = () => {
-      const a = authScreen(`<div class="auth-brand">Ritmo</div>
+      const a = authScreen(`<div class="auth-brand">Habit</div>
         <h1>Revisa tu correo</h1>
         <p>Te enviamos un código a <b>${esc(email)}</b>. Si no aparece, mira en spam.</p>
         <div class="field"><label class="lbl" for="au-code">Código</label>
@@ -296,14 +296,14 @@ async function shareInvite(btn){
   try {
     const code = await cloud.createInvite();
     const url = `${location.origin}${location.pathname}?i=${code}`;
-    const text = `${state.profile.name || 'Tu amigo'} te invita a Ritmo para hacer hábitos juntos.`;
-    if (navigator.share) { try { await navigator.share({title:'Ritmo', text, url}); } catch(e) { if (e.name !== 'AbortError') throw e; } }
+    const text = `${state.profile.name || 'Tu amigo'} te invita a Habit para hacer hábitos juntos.`;
+    if (navigator.share) { try { await navigator.share({title:'Habit', text, url}); } catch(e) { if (e.name !== 'AbortError') throw e; } }
     else { await navigator.clipboard.writeText(`${text} ${url}`); toast('Enlace copiado. Pégalo en WhatsApp.'); }
   } catch(e) { toast('No se pudo crear la invitación. Revisa tu internet.'); }
   btn.classList.remove('loading');
 }
 function setupScreen(){
-  authScreen(`<div class="auth-brand">Ritmo</div><h1>Falta conectar la base de datos</h1>
+  authScreen(`<div class="auth-brand">Habit</div><h1>Falta conectar la base de datos</h1>
     <p>Copia la URL y la clave pública de tu proyecto de Supabase en <b>config.js</b>. Los pasos están en el README.</p>`);
 }
 async function boot(){
@@ -323,7 +323,7 @@ async function boot(){
   try { state = normalize(await sync.load()); }
   catch(e) {
     console.warn('[ritmo] load', e);
-    if (!cached) { authScreen('<div class="auth-brand">Ritmo</div><h1>No pudimos cargar tu día</h1><p>Revisa tu conexión y vuelve a abrir la app.</p>'); return; }
+    if (!cached) { authScreen('<div class="auth-brand">Habit</div><h1>No pudimos cargar tu día</h1><p>Revisa tu conexión y vuelve a abrir la app.</p>'); return; }
   }
   await refreshFriends();
   await acceptPendingInvite();

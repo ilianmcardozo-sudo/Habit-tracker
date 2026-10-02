@@ -1,4 +1,4 @@
-<title>Ritmo</title>
+<title>Habit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Onest:wght@400;500;600;700&display=swap">
@@ -1366,7 +1366,7 @@ function renderHeader(){
   const s = dayStats(), nm = state.profile.name;
   if (ui.tab === 'today' && !ui.page && !active().length) {
     $('backBtn').hidden = true; $('streakChip').hidden = true; $('avatarBtn').hidden = true;
-    $('eyebrow').textContent = 'Ritmo · para ti y tu amigo';
+    $('eyebrow').textContent = 'Habit · para ti y tu amigo';
     { const n = (ui.nameDraft || state.profile.name || '').trim(); $('title').textContent = (ui.onbStep || 0) === 0 || !n ? 'Hola' : 'Hola, ' + n; }
     return;
   }

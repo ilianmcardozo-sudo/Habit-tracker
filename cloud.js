@@ -1,4 +1,4 @@
-/* Ritmo · conexión con Supabase.
+/* Habit · conexión con Supabase.
    La app trabaja siempre sobre su estado en memoria (como el prototipo) y este
    módulo lo carga, lo guarda en segundo plano y trae los datos del amigo.
    Las reglas importantes (candado de las 4:00, quién ve qué) las aplica la

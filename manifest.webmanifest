@@ -1,6 +1,6 @@
 {
-  "name": "Ritmo",
-  "short_name": "Ritmo",
+  "name": "Habit",
+  "short_name": "Habit",
   "description": "Tus hábitos del día, con tu amigo.",
   "lang": "es",
   "start_url": "./",

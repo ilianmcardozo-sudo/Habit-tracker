@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Ritmo">
-<title>Ritmo</title>
+<meta name="apple-mobile-web-app-title" content="Habit">
+<title>Habit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,500..900&family=Onest:wght@400;500;600;700&display=swap">
@@ -808,7 +808,7 @@ body.onboarding .tabbar,body.onboarding #score,body.onboarding #reviewSlot{displ
   </defs>
 </svg>
 
-<div class="splash" id="splash" aria-hidden="true"><div class="splash-mark">Ritmo</div></div>
+<div class="splash" id="splash" aria-hidden="true"><div class="splash-mark">Habit</div></div>
 <div class="auth" id="auth" hidden></div>
 <div class="app">
   <header class="top">
@@ -1341,7 +1341,7 @@ function renderHeader(){
   const s = dayStats(), nm = state.profile.name;
   if (ui.tab === 'today' && !ui.page && !active().length) {
     $('backBtn').hidden = true; $('streakChip').hidden = true; $('avatarBtn').hidden = true;
-    $('eyebrow').textContent = friends.length === 1 ? `Ritmo · con ${friendName()}` : friends.length ? 'Ritmo · con tus amigos' : 'Ritmo · para ti y tu amigo';
+    $('eyebrow').textContent = friends.length === 1 ? `Habit · con ${friendName()}` : friends.length ? 'Habit · con tus amigos' : 'Habit · para ti y tu amigo';
     { const n = (ui.nameDraft || state.profile.name || '').trim(); $('title').textContent = (ui.onbStep || 0) === 0 || !n ? 'Hola' : 'Hola, ' + n; }
     return;
   }
@@ -2289,8 +2289,8 @@ function authFlow(){
     try { email = localStorage.getItem('ritmo-email') || ''; } catch(e) {}
     const invited = (() => { try { return !!localStorage.getItem(INVITE_KEY); } catch(e) { return false; } })();
     const stepEmail = () => {
-      const a = authScreen(`<div class="auth-brand">Ritmo</div>
-        <h1>${invited ? 'Te invitaron a Ritmo' : 'Tus hábitos, con tu amigo.'}</h1>
+      const a = authScreen(`<div class="auth-brand">Habit</div>
+        <h1>${invited ? 'Te invitaron a Habit' : 'Tus hábitos, con tus amigos.'}</h1>
         <p>${invited ? 'Entra con tu correo y quedarán conectados.' : 'Marca tu día, sube la montaña y mantengan la racha juntos.'}</p>
         <div class="field"><label class="lbl" for="au-email">Tu correo</label>
           <input id="au-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="tu@correo.com" value="${esc(email)}" enterkeyhint="send"></div>
@@ -2309,7 +2309,7 @@ function authFlow(){
       setTimeout(() => inp.focus(), 350);
     };
     const stepCode = () => {
-      const a = authScreen(`<div class="auth-brand">Ritmo</div>
+      const a = authScreen(`<div class="auth-brand">Habit</div>
         <h1>Revisa tu correo</h1>
         <p>Te enviamos un código a <b>${esc(email)}</b>. Si no aparece, mira en spam.</p>
         <div class="field"><label class="lbl" for="au-code">Código</label>
@@ -2366,14 +2366,14 @@ async function shareInvite(btn){
   try {
     const code = await cloud.createInvite();
     const url = `${location.origin}${location.pathname}?i=${code}`;
-    const text = `${state.profile.name || 'Tu amigo'} te invita a Ritmo para hacer hábitos juntos.`;
-    if (navigator.share) { try { await navigator.share({title:'Ritmo', text, url}); } catch(e) { if (e.name !== 'AbortError') throw e; } }
+    const text = `${state.profile.name || 'Tu amigo'} te invita a Habit para hacer hábitos juntos.`;
+    if (navigator.share) { try { await navigator.share({title:'Habit', text, url}); } catch(e) { if (e.name !== 'AbortError') throw e; } }
     else { await navigator.clipboard.writeText(`${text} ${url}`); toast('Enlace copiado. Pégalo en WhatsApp.'); }
   } catch(e) { toast('No se pudo crear la invitación. Revisa tu internet.'); }
   btn.classList.remove('loading');
 }
 function setupScreen(){
-  authScreen(`<div class="auth-brand">Ritmo</div><h1>Falta conectar la base de datos</h1>
+  authScreen(`<div class="auth-brand">Habit</div><h1>Falta conectar la base de datos</h1>
     <p>Copia la URL y la clave pública de tu proyecto de Supabase en <b>config.js</b>. Los pasos están en el README.</p>`);
 }
 async function boot(){
@@ -2393,7 +2393,7 @@ async function boot(){
   try { state = normalize(await sync.load()); }
   catch(e) {
     console.warn('[ritmo] load', e);
-    if (!cached) { authScreen('<div class="auth-brand">Ritmo</div><h1>No pudimos cargar tu día</h1><p>Revisa tu conexión y vuelve a abrir la app.</p>'); return; }
+    if (!cached) { authScreen('<div class="auth-brand">Habit</div><h1>No pudimos cargar tu día</h1><p>Revisa tu conexión y vuelve a abrir la app.</p>'); return; }
   }
   await refreshFriends();
   await acceptPendingInvite();

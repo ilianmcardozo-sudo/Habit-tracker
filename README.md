@@ -1,4 +1,4 @@
-# Ritmo
+# Habit
 
 Tus hábitos del día, con tus amigos. Marca lo que hiciste, sube la montaña hasta el 100 % y mantengan la racha juntos.
 
@@ -17,10 +17,10 @@ Es una página estática (`index.html` + `cloud.js`), sin build. Supabase guarda
 1. Crea una cuenta en [supabase.com](https://supabase.com) y luego **New project**. Elige la región más cercana y guarda la contraseña de la base de datos en un lugar seguro.
 2. Ve a **SQL Editor → New query**, pega todo `supabase/schema.sql` y pulsa **Run**. Esto crea las tablas, los permisos, el candado de las 4:00 y el almacenamiento privado de fotos.
 3. Ve a **Authentication → Emails → Templates → Magic Link** y cambia el contenido para que envíe el código:
-   - Asunto: `Tu código de Ritmo: {{ .Token }}`
+   - Asunto: `Tu código de Habit: {{ .Token }}`
    - Cuerpo:
      ```html
-     <h2>Tu código para entrar a Ritmo</h2>
+     <h2>Tu código para entrar a Habit</h2>
      <p style="font-size:32px;font-weight:700;letter-spacing:6px">{{ .Token }}</p>
      <p>Vence en 1 hora. Si no lo pediste, ignora este correo.</p>
      ```

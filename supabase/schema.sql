@@ -1,4 +1,4 @@
--- Ritmo · esquema de base de datos para Supabase
+-- Habit · esquema de base de datos para Supabase
 -- Pégalo completo en Supabase → SQL Editor → New query → Run.
 -- Se puede ejecutar más de una vez sin romper nada.
 
