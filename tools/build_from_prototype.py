@@ -1,5 +1,9 @@
-"""One-off: turns the Ritmo prototype (single HTML, localStorage + sample data)
-into the connected app (Supabase via cloud.js). Kept for reference."""
+"""Turns the Ritmo prototype (single HTML, localStorage + sample data) into the
+connected app (Supabase via cloud.js):
+
+    python3 tools/build_from_prototype.py tools/prototype.html index.html
+
+Design changes go into the prototype first, then this rebuilds index.html."""
 import sys, re
 src, dst = sys.argv[1], sys.argv[2]
 s = open(src, encoding='utf-8').read()
@@ -71,6 +75,14 @@ rep('</style>', '''
 .invite p{margin:0;color:var(--muted);font-size:15px;line-height:1.45;max-width:32ch}
 .invite .btn{margin-top:6px}
 .acct{color:var(--muted);font-size:14px;word-break:break-all}
+/* ---------- friends: one pair each, pick who to look at ---------- */
+.fpick{margin-bottom:-6px}
+.fpick .fchip{display:inline-flex;align-items:center;gap:7px;padding:6px 14px 6px 6px}
+.fpick .fchip .avatar{width:26px;height:26px;border-radius:9px;font-size:12px}
+.fpick .fchip.on .avatar.f{background:var(--ink);color:var(--fg);box-shadow:none}
+.fpick .fchip.add{padding:6px 14px;color:var(--muted)}
+.fpick .fchip.add svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
+.unfriend{display:block;margin:4px auto 0}
 </style>''')
 
 # ---------- module script + async boot ----------
@@ -83,7 +95,7 @@ rep("function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); re
     "function save(){ return sync ? sync.save(state) : true; }")
 rep('''let state = load() || seed();
 const friend = seedFriend();''', '''const emptyState = () => ({habits:[], log:{}, frozen:{}, profile:{name:'', accent:ACCENTS[0], accentSet:true}});
-let state = emptyState(), friend = null, sync = null, me = null;''')
+let state = emptyState(), friends = [], friend = null, sync = null, me = null;''')
 rep("const newId = () => 'h' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);",
     "const newId = () => crypto.randomUUID();")
 
@@ -107,6 +119,10 @@ rep('${ui.photoDraft.map((src,i) => `<div class="ph"><img src="${src}"', '${ui.p
 # ---------- friend may not exist yet ----------
 rep("  const a = dayStatus(state,k), b = dayStatus(friend,k);", "  if (!friend) return null;\n  const a = dayStatus(state,k), b = dayStatus(friend,k);")
 rep("function friendNews(since){\n  const t = todayKey(), items = [];", "function friendNews(since){\n  if (!friend) return 0;\n  const t = todayKey(), items = [];")
+rep("  const news = ui.tab === 'friend' ? 0 : friendNews(state.friendSeenAt || 0);",
+    "  const news = ui.tab === 'friend' ? 0 : friends.reduce((n, f) => n + withFriend(f, () => friendNews(state.friendSeenAt || 0)), 0);")
+rep("  $('view-friend').innerHTML = html;\n}", "  $('view-friend').innerHTML = friendPicker() + html + unfriendHTML(fname);\n}")
+rep("<span>Tu amigo verá tus notas y fotos.", "<span>${friends.length > 1 ? 'Tus amigos verán' : 'Tu amigo verá'} tus notas y fotos.")
 rep("  if (ui.tab === 'friend') { $('eyebrow').textContent = 'Vista previa'; $('title').textContent = 'Tu amigo'; return; }",
     "  if (ui.tab === 'friend') { $('eyebrow').textContent = friend ? 'Tu amigo' : 'Juntos'; $('title').textContent = friend ? friendName() : 'Tu amigo'; return; }")
 rep('''function renderFriend(){
@@ -118,9 +134,15 @@ function renderInvite(){
     <h3>Hagan hábitos juntos</h3>
     <p>Invita a tu amigo. Verán el día del otro, sus notas y fotos, y tendrán una racha que solo sube si los dos cumplen.</p>
     <button class="btn wide" data-act="invite">Invitar a mi amigo</button>
-    <div class="hint">Cuando entre con tu enlace, aparecerá aquí.</div>
+    <div class="hint">Cuando entre con tu enlace, aparecerá aquí. Puedes invitar a más de un amigo: cada uno ve tu día, pero no el de los otros.</div>
   </div>`;
 }
+/* Each friendship is its own pair. Chips pick whose day is on screen; "Invitar" adds another pair. */
+function withFriend(f, fn){ const prev = friend; friend = f; try { return fn(); } finally { friend = prev; } }
+function friendPicker(){
+  return `<div class="filters fpick" role="tablist" aria-label="Tus amigos">${friends.map(f => `<button class="fchip${f === friend ? ' on' : ''}" data-act="pick-friend" data-id="${esc(f.id)}" role="tab" aria-selected="${f === friend}"><span class="avatar f">${esc(initial(f.profile.name) || 'A')}</span>${esc(f.profile.name || 'Tu amigo')}</button>`).join('')}<button class="fchip add" data-act="invite">${PLUS_SVG}Invitar</button></div>`;
+}
+const unfriendHTML = name => `<button class="link unfriend" data-act="unfriend" data-id="${esc(friend.id)}">${ui.confirmUnfriend === friend.id ? `¿Seguro? Toca otra vez para dejar de ser amigos con ${esc(name)}` : `Dejar de ser amigos con ${esc(name)}`}</button>`;
 function renderFriend(){
   if (!friend) return renderInvite();
   const fname = friendName();
@@ -131,28 +153,45 @@ rep("${row({l:'A', f:true}, 'Tu amigo', p, frDone)}", "${row({l:initial(fname) |
 rep("· tu amigo ${s.cur}</div>", "· ${esc(fname)} ${s.cur}</div>")
 i0 = s.index("  const frDone = withState(friend, () => isFull(t) || isRest(t)), frP"); j0 = s.index("\n", s.index("  const fr = frDone ?", i0)) + 1
 s = s[:i0] + '''  let fr = '';
-  if (friend) {
+  if (friends.length === 1) withFriend(friends[0], () => {
     const frDone = withState(friend, () => isFull(t) || isRest(t)), frP = withState(friend, () => Math.round(dayPct(t)*100));
     fr = frDone ? `${friendName()} también cumplió. Racha juntos: ${sharedStreak()}.` : `${friendName()} va al ${frP}\u00a0%. Falta para sumar juntos.`;
+  });
+  else if (friends.length > 1) {
+    const done = friends.filter(f => withState(f, () => isFull(t) || isRest(t))).length;
+    fr = done ? `${done} de ${friends.length} amigos también cumplieron hoy.` : 'Tus amigos todavía no completan su día.';
   }
 ''' + s[j0:]
 rep('      <p class="cel-fr">${esc(fr)}</p>', "      ${fr ? `<p class=\"cel-fr\">${esc(fr)}</p>` : ''}")
 rep("  freezePast(); withState(friend, freezePast); save(); render();\n  toast('Nuevo día. El de ayer quedó guardado.');",
-    "  freezePast(); if (friend) withState(friend, freezePast); save(); render();\n  toast('Nuevo día. El de ayer quedó guardado.');")
+    "  freezePast(); friends.forEach(f => withState(f, freezePast)); save(); render();\n  toast('Nuevo día. El de ayer quedó guardado.');")
 
-rep("    $('eyebrow').textContent = 'Ritmo · para ti y tu amigo';", "    $('eyebrow').textContent = friend ? `Ritmo · con ${friendName()}` : 'Ritmo · para ti y tu amigo';")
+rep("    $('eyebrow').textContent = 'Ritmo · para ti y tu amigo';", "    $('eyebrow').textContent = friends.length === 1 ? `Ritmo · con ${friendName()}` : friends.length ? 'Ritmo · con tus amigos' : 'Ritmo · para ti y tu amigo';")
 
 # ---------- profile: account instead of sample reset ----------
 rep('''      ${state.sample ? `<div class="field"><span class="lbl">Datos de ejemplo</span>
         <button class="btn danger wide" data-act="reset">${ui.confirmReset ? '¿Seguro? Toca otra vez' : 'Borrar ejemplos y empezar de cero'}</button></div>` : ''}''',
 '''      <div class="field"><span class="lbl">Cuenta</span>
-        <div class="acct">${esc((me && me.email) || '')}${friend ? ` · conectado con ${esc(friendName())}` : ''}</div>
+        <div class="acct">${esc((me && me.email) || '')}${friends.length ? ` · conectado con ${esc(friends.map(f => f.profile.name || 'Tu amigo').join(', '))}` : ''}</div>
         <button class="btn ghost wide" data-act="signout">Cerrar sesión</button></div>''')
 rep('''    case 'reset':''', '''    case 'signout':
       b.classList.add('loading');
       sync.flush().catch(() => {}).then(() => cloud.signOut(me.id)).finally(() => location.reload());
       break;
     case 'invite': shareInvite(b); break;
+    case 'pick-friend':
+      friend = friends.find(f => f.id === b.dataset.id) || friend; ui.friendId = friend && friend.id; ui.confirmUnfriend = null;
+      render(); window.scrollTo({top:0}); break;
+    case 'unfriend': {
+      const id = b.dataset.id, f = friends.find(x => x.id === id); if (!f) break;
+      if (ui.confirmUnfriend !== id) { ui.confirmUnfriend = id; render(); break; }
+      b.classList.add('loading');
+      cloud.removeFriend(id).then(refreshFriends).then(() => {
+        ui.confirmUnfriend = null; render(); window.scrollTo({top:0});
+        toast(`Ya no eres amigo de ${f.profile.name || 'esa persona'}`);
+      }).catch(() => { b.classList.remove('loading'); toast('No se pudo. Revisa tu internet.'); });
+      break;
+    }
     case 'reset':''')
 
 # ---------- boot ----------
@@ -226,25 +265,27 @@ function authFlow(){
     stepEmail();
   });
 }
-async function refreshFriend(){
+async function refreshFriends(){
   try {
-    const f = await cloud.loadFriend(me.id);
-    if (f) { normalize(f); withState(f, freezePast); }
-    const changed = JSON.stringify(f) !== JSON.stringify(friend);
-    friend = f;
+    const list = await cloud.loadFriends(me.id);
+    list.forEach(f => { normalize(f); withState(f, freezePast); });
+    const changed = JSON.stringify(list) !== JSON.stringify(friends);
+    friends = list;
+    friend = friends.find(f => f.id === ui.friendId) || friends[0] || null;
+    ui.friendId = friend && friend.id;
     return changed;
-  } catch(e) { console.warn('[ritmo] friend', e); return false; }
+  } catch(e) { console.warn('[ritmo] friends', e); return false; }
 }
 async function acceptPendingInvite(){
   let code = null; try { code = localStorage.getItem(INVITE_KEY); } catch(e) {}
   if (!code) return;
   try {
-    await cloud.acceptInvite(code);
-    await refreshFriend();
+    ui.friendId = await cloud.acceptInvite(code);
+    await refreshFriends();
     if (friend) { if (active().length) ui.tab = 'friend'; setTimeout(() => toast(`Ya estás conectado con ${friendName()}`), 400); }
   } catch(e) {
     const m = (e && e.message) || '';
-    if (/already_has_friend/.test(m)) toast('Ya tienes un amigo conectado.');
+    if (/too_many_friends/.test(m)) toast('Llegaste al máximo de amigos.');
     else if (/invite_used|invite_not_found/.test(m)) toast('Ese enlace ya no sirve. Pídele uno nuevo.');
     else if (!/own_invite/.test(m)) { toast('No se pudo usar la invitación. Inténtalo de nuevo.'); return; }
   }
@@ -253,8 +294,8 @@ async function acceptPendingInvite(){
 async function shareInvite(btn){
   btn.classList.add('loading');
   try {
-    ui.inviteCode = ui.inviteCode || await cloud.createInvite();
-    const url = `${location.origin}${location.pathname}?i=${ui.inviteCode}`;
+    const code = await cloud.createInvite();
+    const url = `${location.origin}${location.pathname}?i=${code}`;
     const text = `${state.profile.name || 'Tu amigo'} te invita a Ritmo para hacer hábitos juntos.`;
     if (navigator.share) { try { await navigator.share({title:'Ritmo', text, url}); } catch(e) { if (e.name !== 'AbortError') throw e; } }
     else { await navigator.clipboard.writeText(`${text} ${url}`); toast('Enlace copiado. Pégalo en WhatsApp.'); }
@@ -284,10 +325,10 @@ async function boot(){
     console.warn('[ritmo] load', e);
     if (!cached) { authScreen('<div class="auth-brand">Ritmo</div><h1>No pudimos cargar tu día</h1><p>Revisa tu conexión y vuelve a abrir la app.</p>'); return; }
   }
-  await refreshFriend();
+  await refreshFriends();
   await acceptPendingInvite();
   freezePast(); save(); render(); hideSplash();
-  const poll = async () => { if (!document.hidden && await refreshFriend() && !ui.sheet) render(); };
+  const poll = async () => { if (!document.hidden && await refreshFriends() && !ui.sheet) render(); };
   setInterval(poll, 60000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); else sync.flush(); });
   window.addEventListener('online', () => sync.flush());
