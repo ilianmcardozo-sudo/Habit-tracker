@@ -208,7 +208,9 @@ function setSyncStatus(st){
   if (st === 'offline' && !offlineShown) { offlineShown = true; toast('Sin conexión. Se guardará cuando vuelva.'); }
   if (st === 'saved') offlineShown = false;
 }
-function hideSplash(){ const sp = $('splash'); sp.classList.add('out'); setTimeout(() => { sp.hidden = true; }, 400); }
+function hideSplash(){ const sp = $('splash'); sp.classList.add('out'); clearTimeout(ui.splashT); ui.splashT = setTimeout(() => { sp.hidden = true; }, 400); }
+/* Covers the app while the first load runs, so the empty "Hoy" skeleton never flashes. */
+function showSplash(){ const sp = $('splash'); clearTimeout(ui.splashT); sp.hidden = false; sp.classList.remove('out'); }
 function authScreen(html){ const a = $('auth'); a.hidden = false; a.innerHTML = `<div class="auth-art">${AUTH_ART}</div><div class="auth-in">${html}</div>`; hideSplash(); return a; }
 const AUTH_ERRORS = [[/rate|seconds|too many/i, 'Espera un momento antes de pedir otro código.'], [/expired|invalid|token/i, 'Ese código no es correcto o ya venció.'], [/email/i, 'Revisa que el correo esté bien escrito.']];
 const authMsg = err => (AUTH_ERRORS.find(([re]) => re.test((err && err.message) || '')) || [0, 'No se pudo conectar. Revisa tu internet.'])[1];
@@ -316,7 +318,7 @@ async function boot(){
   if (inv) { try { localStorage.setItem(INVITE_KEY, inv); } catch(e) {} history.replaceState(null, '', location.pathname); }
   if (!cloud.configured) return setupScreen();
   me = await cloud.currentUser().catch(() => null);
-  if (!me) { me = await authFlow(); $('auth').hidden = true; }
+  if (!me) { me = await authFlow(); showSplash(); $('auth').hidden = true; }
   sync = cloud.createSync(me.id, {
     getState: () => state,
     photoUploaded: (dataUrl, path) => cloud.rememberPhoto(dataUrl, path),
