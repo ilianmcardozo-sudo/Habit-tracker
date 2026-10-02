@@ -29,6 +29,16 @@ jobs:
       - name: Compilar el APK de prueba
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon
+      - name: Revisar que el APK trae la app
+        run: |
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          unzip -l "$APK" > contents.txt
+          for f in assets/public/index.html assets/public/cloud.js assets/public/config.js \
+                   assets/public/vendor/supabase.js assets/capacitor.config.json res/mipmap-xxxhdpi/ic_launcher.png; do
+            grep -q " $f$" contents.txt || { echo "Falta $f en el APK"; exit 1; }
+          done
+          unzip -p "$APK" assets/public/config.js | grep -q "supabase.co" || { echo "config.js sin Supabase"; exit 1; }
+          echo "APK OK: $(du -h "$APK" | cut -f1)"
       - uses: actions/upload-artifact@v4
         with:
           name: habit-apk
