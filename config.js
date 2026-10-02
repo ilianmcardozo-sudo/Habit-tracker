@@ -3,3 +3,5 @@
    reglas de seguridad de supabase/schema.sql. Nunca pongas aquí la "service_role". */
 export const SUPABASE_URL = 'https://klhbihxnxgokilvbzxow.supabase.co';
 export const SUPABASE_ANON_KEY = 'sb_publishable_Rjh0JggW2N-bY-6K03i8Rw_hOKn-4vo';
+/* Dirección pública de la app web (Vercel). La app de Android la usa para los enlaces de invitación. */
+export const WEB_URL = 'https://habit-ten-iota.vercel.app/';

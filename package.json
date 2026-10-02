@@ -1,0 +1,21 @@
+{
+  "name": "habit",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Habit: tus hábitos del día, con tus amigos.",
+  "type": "module",
+  "scripts": {
+    "www": "node tools/build-www.mjs",
+    "vendor": "esbuild tools/supabase-entry.js --bundle --format=esm --minify --outfile=vendor/supabase.js",
+    "android": "npm run www && cap sync android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
+    "@supabase/supabase-js": "^2.117.2",
+    "esbuild": "^0.28.2"
+  }
+}

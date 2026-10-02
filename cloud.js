@@ -3,9 +3,12 @@
    módulo lo carga, lo guarda en segundo plano y trae los datos del amigo.
    Las reglas importantes (candado de las 4:00, quién ve qué) las aplica la
    base de datos, no el teléfono. */
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
+import { createClient } from './vendor/supabase.js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY, WEB_URL } from './config.js';
 
+/* Inside the Android app the page lives at https://localhost, so links meant for other people use the web address. */
+export const isNative = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+export const inviteURL = code => `${isNative ? WEB_URL : location.origin + location.pathname}?i=${code}`;
 export const configured = !!(SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_URL.includes('TU-PROYECTO'));
 export const sb = configured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: false }

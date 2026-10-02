@@ -1,0 +1,9 @@
+{
+  "appId": "com.ilianmcardozo.habit",
+  "appName": "Habit",
+  "webDir": "www",
+  "backgroundColor": "#0D0F12",
+  "android": {
+    "backgroundColor": "#0D0F12"
+  }
+}

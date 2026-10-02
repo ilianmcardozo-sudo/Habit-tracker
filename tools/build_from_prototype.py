@@ -304,7 +304,7 @@ async function shareInvite(btn){
   btn.classList.add('loading');
   try {
     const code = await cloud.createInvite();
-    const url = `${location.origin}${location.pathname}?i=${code}`;
+    const url = cloud.inviteURL(code);
     const text = `${state.profile.name || 'Tu amigo'} te invita a Habit para hacer hábitos juntos.`;
     if (navigator.share) { try { await navigator.share({title:'Habit', text, url}); } catch(e) { if (e.name !== 'AbortError') throw e; } }
     else { await navigator.clipboard.writeText(`${text} ${url}`); toast('Enlace copiado. Pégalo en WhatsApp.'); }

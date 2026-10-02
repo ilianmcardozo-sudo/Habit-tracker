@@ -1,0 +1,5 @@
+{
+  "installCommand": "echo sin dependencias",
+  "buildCommand": "node tools/build-www.mjs",
+  "outputDirectory": "www"
+}
