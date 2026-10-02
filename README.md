@@ -47,11 +47,25 @@ Es una página estática (`index.html` + `cloud.js`), sin build. Supabase guarda
 
 > El plan gratis de Supabase envía pocos correos por hora. Para unos pocos amigos sobra. Si algún día se queda corto, conecta un SMTP propio (por ejemplo Resend) en **Authentication → Emails → SMTP Settings**.
 
+## App de Android
+
+La misma app empaquetada con [Capacitor](https://capacitorjs.com) (`android/`). GitHub la compila sola en cada cambio:
+
+1. En GitHub, abre la pestaña **Actions**, luego la ejecución más reciente de **Android**.
+2. Abajo, en **Artifacts**, descarga **habit-apk** (es un `.zip` con `app-debug.apk` adentro).
+3. Pasa el `.apk` al teléfono, ábrelo y acepta **Instalar apps desconocidas** para ese archivo.
+
+Para trabajar en local hace falta Android Studio: `npm ci`, luego `npm run android` y abre `android/` en Android Studio.
+
+Los archivos web viven en la raíz; `npm run www` los copia a `www/`, que es lo que empaqueta Capacitor y lo que publica Vercel (`vercel.json`).
+
 ## Estructura
 
 | Archivo | Qué es |
 | --- | --- |
 | `index.html` | La app completa: diseño, pantallas y lógica de hábitos. |
+| `android/`, `capacitor.config.json` | La app de Android (Capacitor). `assets/` tiene el ícono y la pantalla de inicio de origen. |
+| `vendor/supabase.js` | supabase-js empaquetado (`npm run vendor`), para no depender de un CDN al abrir. |
 | `cloud.js` | Conexión con Supabase: login, guardado en segundo plano, amigos, invitaciones y fotos privadas. |
 | `config.js` | URL y clave pública de tu proyecto de Supabase. |
 | `supabase/schema.sql` | Tablas, permisos (RLS), candado de las 4:00 y almacenamiento de fotos. |
