@@ -490,6 +490,9 @@ textarea.short{min-height:76px}
 .rv-dots i.now{background:var(--fg)}
 .rv-q{margin:0;font-family:var(--display);font-size:30px;line-height:1.12;text-align:center;letter-spacing:-.01em;text-wrap:balance}
 .rv-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rv-addnote{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;border-radius:14px;border:1.5px dashed var(--line);text-decoration:none!important}
+.rv-addnote svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rv-note textarea{min-height:70px}
 .rv-hero{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0}
 .rv-big{font-size:88px;line-height:1}
 .rv-big small{font-size:34px;color:var(--muted)}
@@ -1241,6 +1244,20 @@ function reviewList(){
     return progressOf(h,k) < 1 || (askOf(h) && e.answer == null);
   }).map(h => h.id);
 }
+/* Each review step can carry a note and photos, with the same drafts as the note sheet.
+   Collapsed behind one link so the quick yes/no flow stays one tap per habit. */
+function syncReviewDraft(id){
+  if (ui.review.draftFor === id) return;
+  const e = entry(todayKey(), id) || {};
+  ui.review.draftFor = id; ui.noteDraft = e.note || ''; ui.photoDraft = [...photosOf(e)];
+  ui.review.noteOpen = !!(e.note || photosOf(e).length);
+}
+function reviewNoteHTML(){
+  if (!ui.review.noteOpen) return `<button class="link rv-addnote" data-act="review-note">${CAM_SVG}<span>Añadir nota o foto</span></button>`;
+  return `<div class="field rv-note"><label class="lbl" for="note-input">Nota</label>
+    <textarea id="note-input" class="short" placeholder="¿Cómo te fue? Tiempo, cantidad, sensaciones…">${esc(ui.noteDraft)}</textarea>
+    ${photoRowHTML(true)}</div>`;
+}
 function reviewHTML(){
   const k = todayKey(), ids = ui.review.list, i = ui.review.i;
   if (i >= ids.length) {
@@ -1250,18 +1267,19 @@ function reviewHTML(){
       <div class="actions"><button class="btn" data-act="close">Listo</button></div>`;
   }
   const h = state.habits.find(x => x.id === ids[i]); if (!h) { ui.review.i++; return reviewHTML(); }
+  syncReviewDraft(h.id);
   const e = entry(k,h.id) || {}, kd = kindOf(h), a = askOf(h);
   const dots = `<div class="rv-dots">${ids.map((_,j) => `<i class="${j < i ? 'past' : j === i ? 'now' : ''}"></i>`).join('')}</div>`;
   let q, body;
   if (kd === 'check' && !e.done) {
     q = `¿${h.name}?`;
-    body = `<div class="rv-actions"><button class="btn ghost" data-act="review-next">Todavía no</button><button class="btn" data-act="review-yes">Sí, lo hice</button></div>`;
+    body = reviewNoteHTML() + `<div class="rv-actions"><button class="btn ghost" data-act="review-skip">Todavía no</button><button class="btn" data-act="review-yes">Sí, lo hice</button></div>`;
   } else if (kd === 'check') {
     q = a ? a.q : h.name;
-    body = askHTML(h, k, false) + `<button class="btn ghost wide" data-act="review-next">Saltar</button>`;
+    body = askHTML(h, k, false) + reviewNoteHTML() + `<button class="btn ghost wide" data-act="review-next">${a ? 'Saltar' : 'Siguiente'}</button>`;
   } else if (kd === 'amount') {
     q = h.name;
-    body = measureHTML(h, k) + `<button class="btn wide" data-act="review-next">Siguiente</button>`;
+    body = measureHTML(h, k) + reviewNoteHTML() + `<button class="btn wide" data-act="review-next">Siguiente</button>`;
   } else {
     q = a ? a.q : h.name;
     body = askHTML(h, k, false) + `<button class="btn ghost wide" data-act="review-next">Saltar</button>`;
@@ -1902,7 +1920,9 @@ function openSheet(s){
   requestAnimationFrame(() => requestAnimationFrame(() => { b.classList.add('open'); sh.classList.add('open'); }));
 }
 function commitNote(){
-  const s = ui.sheet; if (!s || s.mode !== 'note' || !isToday(s.day)) return null;
+  const sh = ui.sheet; if (!sh) return null;
+  const s = sh.mode === 'note' ? sh : sh.mode === 'review' && ui.review.draftFor ? {id: ui.review.draftFor, day: todayKey()} : null;
+  if (!s || !isToday(s.day)) return null;
   const note = ui.noteDraft.trim(), photos = [...ui.photoDraft];
   const prev = entry(s.day,s.id) || {done:false, note:'', photos:[]};
   if (note === (prev.note || '') && JSON.stringify(photos) === JSON.stringify(photosOf(prev))) return null;
@@ -2120,12 +2140,13 @@ document.addEventListener('change', async e => {
   if (e.target.id !== 'photo-input') return;
   const files = [...e.target.files].slice(0, MAX_PHOTOS - ui.photoDraft.length);
   e.target.value = '';
-  if (!files.length || !ui.sheet || ui.sheet.mode !== 'note') return;
+  const drafting = () => ui.sheet && (ui.sheet.mode === 'note' || ui.sheet.mode === 'review');
+  if (!files.length || !drafting()) return;
   ui.busy = files.length; renderSheet();
   for (const f of files) {
     try { ui.photoDraft.push(await compress(f)); } catch(err) { toast('No se pudo leer esa imagen'); }
     ui.busy = Math.max(0, ui.busy - 1);
-    if (ui.sheet && ui.sheet.mode === 'note') renderSheet();
+    if (drafting()) renderSheet();
   }
 });
 document.addEventListener('keydown', e => {
@@ -2203,15 +2224,19 @@ document.addEventListener('click', e => {
       const k = todayKey(), h = state.habits.find(x => x.id === b.dataset.id); if (!h) break;
       const i = +b.dataset.i, cur = (entry(k,h.id) || {}).answer;
       setMeasure(k, h, {answer: cur === i ? null : i});
-      if (ui.sheet && ui.sheet.mode === 'review' && cur !== i) setTimeout(() => { if (ui.sheet && ui.sheet.mode === 'review') { ui.review.i++; renderSheet(); } }, 280);
+      if (ui.sheet && ui.sheet.mode === 'review' && cur !== i) setTimeout(() => { if (ui.sheet && ui.sheet.mode === 'review') { commitNote(); ui.review.i++; renderSheet(); } }, 280);
       break;
     }
     case 'review': ui.review = {list: reviewList(), i: 0}; openSheet({mode:'review'}); break;
     case 'review-yes': { const k = todayKey(), id = ui.review.list[ui.review.i], h = state.habits.find(x => x.id === id);
       if (!isDone(k,id)) toggle(k, id, {quiet:true});
+      if (commitNote()?.error) toast('No hay espacio para más fotos en este prototipo');
       if (!(askOf(h) && (entry(k,id) || {}).answer == null)) ui.review.i++;
       renderSheet(); break; }
-    case 'review-next': ui.review.i++; renderSheet(); break;
+    case 'review-next': if (commitNote()?.error) toast('No hay espacio para más fotos en este prototipo'); ui.review.i++; renderSheet(); break;
+    /* "Todavía no": a note is for what you did, so the draft is dropped. */
+    case 'review-skip': ui.review.draftFor = null; ui.review.i++; renderSheet(); break;
+    case 'review-note': ui.review.noteOpen = true; renderSheet(); { const ta = $('note-input'); if (ta) ta.focus(); } break;
     case 'bar': { const c = b.closest('.mcard'); if (c) c.querySelector('.m-cap').textContent = b.dataset.cap; break; }
     case 'ftype': ui.draft.freq.type = b.dataset.v; renderSheet(); break;
     case 'wday': { const v = +b.dataset.v, a = ui.draft.freq.days; ui.draft.freq.days = a.includes(v) ? a.filter(x => x !== v) : [...a, v]; renderSheet(); break; }

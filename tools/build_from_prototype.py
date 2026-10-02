@@ -108,12 +108,14 @@ function photosReady(){
   photoTimer = setTimeout(() => {
     render();
     if (!ui.sheet) return;
-    if (ui.sheet.mode === 'note') document.querySelectorAll('.photo-row .ph img').forEach((img,i) => { img.src = cloud.photoURL(ui.photoDraft[i], photosReady); });
+    if (ui.sheet.mode === 'note' || ui.sheet.mode === 'review') document.querySelectorAll('.photo-row .ph img').forEach((img,i) => { img.src = cloud.photoURL(ui.photoDraft[i], photosReady); });
     else renderSheet();
   }, 20);
 }''')
 rep("ui.noteDraft = e.note || ''; ui.photoDraft = [...photosOf(e)]; }", "ui.noteDraft = e.note || ''; ui.photoDraft = [...rawPhotos(e)]; }")
 rep("JSON.stringify(photos) === JSON.stringify(photosOf(prev))) return null;", "JSON.stringify(photos) === JSON.stringify(rawPhotos(prev))) return null;")
+rep("ui.review.draftFor = id; ui.noteDraft = e.note || ''; ui.photoDraft = [...photosOf(e)];", "ui.review.draftFor = id; ui.noteDraft = e.note || ''; ui.photoDraft = [...rawPhotos(e)];")
+rep("ui.review.noteOpen = !!(e.note || photosOf(e).length);", "ui.review.noteOpen = !!(e.note || rawPhotos(e).length);")
 rep('${ui.photoDraft.map((src,i) => `<div class="ph"><img src="${src}"', '${ui.photoDraft.map((src,i) => `<div class="ph"><img src="${cloud.photoURL(src, photosReady)}"')
 
 # ---------- friend may not exist yet ----------
