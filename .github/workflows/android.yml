@@ -34,9 +34,11 @@ jobs:
           APK=android/app/build/outputs/apk/debug/app-debug.apk
           unzip -l "$APK" > contents.txt
           for f in assets/public/index.html assets/public/cloud.js assets/public/config.js \
-                   assets/public/vendor/supabase.js assets/capacitor.config.json res/mipmap-xxxhdpi/ic_launcher.png; do
+                   assets/public/vendor/supabase.js assets/capacitor.config.json; do
             grep -q " $f$" contents.txt || { echo "Falta $f en el APK"; exit 1; }
           done
+          # aapt2 can add a version qualifier to the folder (mipmap-xxxhdpi-v4)
+          grep -Eq " res/mipmap-xxxhdpi[^/]*/ic_launcher\.(png|webp)$" contents.txt || { echo "Falta el ícono en el APK"; exit 1; }
           unzip -p "$APK" assets/public/config.js | grep -q "supabase.co" || { echo "config.js sin Supabase"; exit 1; }
           echo "APK OK: $(du -h "$APK" | cut -f1)"
       - uses: actions/upload-artifact@v4
