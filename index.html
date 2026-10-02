@@ -772,7 +772,7 @@ body.onboarding .tabbar,body.onboarding #score,body.onboarding #reviewSlot{displ
 .auth p b{color:var(--fg)}
 .auth input{width:100%;font:inherit;font-size:17px;color:var(--fg);background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px;outline:none}
 .auth input:focus{border-color:var(--accent)}
-.auth input.code{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:30px;letter-spacing:.42em;text-align:center;padding:14px 0 14px .42em}
+.auth input.code{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:28px;letter-spacing:.24em;text-align:center;padding:14px 0 14px .24em}
 .auth .field{gap:8px;margin-top:6px}
 .auth-err{min-height:20px;color:#FF8A8A;font-size:14px;font-weight:600}
 .auth-links{display:flex;justify-content:space-between;gap:12px}
@@ -2282,7 +2282,8 @@ function hideSplash(){ const sp = $('splash'); sp.classList.add('out'); setTimeo
 function authScreen(html){ const a = $('auth'); a.hidden = false; a.innerHTML = `<div class="auth-art">${AUTH_ART}</div><div class="auth-in">${html}</div>`; hideSplash(); return a; }
 const AUTH_ERRORS = [[/rate|seconds|too many/i, 'Espera un momento antes de pedir otro código.'], [/expired|invalid|token/i, 'Ese código no es correcto o ya venció.'], [/email/i, 'Revisa que el correo esté bien escrito.']];
 const authMsg = err => (AUTH_ERRORS.find(([re]) => re.test((err && err.message) || '')) || [0, 'No se pudo conectar. Revisa tu internet.'])[1];
-/* Login sin contraseña: correo → código de 6 dígitos. Resuelve con el usuario. */
+/* Login sin contraseña: correo → código numérico. Supabase puede enviar 6 u 8 dígitos
+   (según la plantilla y la configuración), así que se aceptan de 6 a 10. Resuelve con el usuario. */
 function authFlow(){
   return new Promise(resolve => {
     let email = '';
@@ -2296,7 +2297,7 @@ function authFlow(){
           <input id="au-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="tu@correo.com" value="${esc(email)}" enterkeyhint="send"></div>
         <div class="auth-err" id="au-err" role="alert"></div>
         <button class="btn wide" id="au-send">Enviarme un código</button>
-        <div class="auth-foot">Sin contraseñas. Te llega un código de 6 dígitos.</div>`);
+        <div class="auth-foot">Sin contraseñas. Te llega un código por correo.</div>`);
       const inp = a.querySelector('#au-email'), btn = a.querySelector('#au-send'), err = a.querySelector('#au-err');
       const go = async () => {
         email = inp.value.trim().toLowerCase();
@@ -2313,7 +2314,7 @@ function authFlow(){
         <h1>Revisa tu correo</h1>
         <p>Te enviamos un código a <b>${esc(email)}</b>. Si no aparece, mira en spam.</p>
         <div class="field"><label class="lbl" for="au-code">Código</label>
-          <input id="au-code" class="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" placeholder="······"></div>
+          <input id="au-code" class="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="10" placeholder="········"></div>
         <div class="auth-err" id="au-err" role="alert"></div>
         <button class="btn wide" id="au-verify">Entrar</button>
         <div class="auth-links"><button class="link" id="au-back">Usar otro correo</button><button class="link" id="au-resend" disabled>Reenviar en 30 s</button></div>`);
@@ -2321,12 +2322,16 @@ function authFlow(){
       let left = 30; const tick = setInterval(() => { left--; rs.textContent = left > 0 ? `Reenviar en ${left} s` : 'Reenviar código'; rs.disabled = left > 0; if (left <= 0) clearInterval(tick); }, 1000);
       const go = async () => {
         const code = inp.value.replace(/\D/g, '');
-        if (code.length < 6) { err.textContent = 'El código tiene 6 dígitos.'; inp.focus(); return; }
+        clearTimeout(autoGo);
+        if (code.length < 6) { err.textContent = 'Escribe el código completo que te llegó.'; inp.focus(); return; }
+        if (btn.classList.contains('loading')) return;
         btn.classList.add('loading'); err.textContent = '';
         try { const u = await cloud.verifyCode(email, code); clearInterval(tick); buzz(12); resolve(u); }
         catch(e2) { err.textContent = authMsg(e2); btn.classList.remove('loading'); inp.select(); }
       };
-      inp.oninput = () => { inp.value = inp.value.replace(/\D/g, '').slice(0,6); if (inp.value.length === 6) go(); };
+      /* No sabemos si el código trae 6 u 8 dígitos: se envía solo al dejar de escribir (o al pegarlo). */
+      let autoGo = null;
+      inp.oninput = () => { inp.value = inp.value.replace(/\D/g, '').slice(0,10); clearTimeout(autoGo); if (inp.value.length >= 6) autoGo = setTimeout(go, inp.value.length >= 8 ? 300 : 2000); };
       btn.onclick = go;
       a.querySelector('#au-back').onclick = () => { clearInterval(tick); stepEmail(); };
       rs.onclick = async () => { rs.disabled = true; try { await cloud.sendCode(email); toast('Código reenviado'); left = 30; } catch(e2) { err.textContent = authMsg(e2); rs.disabled = false; } };

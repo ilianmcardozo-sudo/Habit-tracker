@@ -2,7 +2,7 @@
 
 Tus hábitos del día, con tus amigos. Marca lo que hiciste, sube la montaña hasta el 100 % y mantengan la racha juntos.
 
-- Entras con tu correo y un código de 6 dígitos. No hay contraseñas.
+- Entras con tu correo y un código que te llega por correo (6 u 8 dígitos). No hay contraseñas.
 - El día cierra a las 4:00 (hora del teléfono). Después ya no se puede cambiar, y eso lo valida la base de datos.
 - Las amistades son siempre de a dos. Puedes tener varios amigos, pero cada pareja es independiente: cada amigo ve tu día completo (con notas y fotos), no el de tus otros amigos. Nadie más puede verlo.
 - Cada pareja tiene su propia racha juntos, que solo sube si los dos cumplen.
