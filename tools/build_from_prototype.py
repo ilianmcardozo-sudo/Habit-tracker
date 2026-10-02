@@ -166,7 +166,7 @@ rep('      <p class="cel-fr">${esc(fr)}</p>', "      ${fr ? `<p class=\"cel-fr\"
 rep("  freezePast(); withState(friend, freezePast); save(); render();\n  toast('Nuevo día. El de ayer quedó guardado.');",
     "  freezePast(); friends.forEach(f => withState(f, freezePast)); save(); render();\n  toast('Nuevo día. El de ayer quedó guardado.');")
 
-rep("    $('eyebrow').textContent = 'Habit · para ti y tu amigo';", "    $('eyebrow').textContent = friends.length === 1 ? `Habit · con ${friendName()}` : friends.length ? 'Habit · con tus amigos' : 'Habit · para ti y tu amigo';")
+rep("    $('eyebrow').textContent = 'Habit · para ti y tu amigo';", "    $('eyebrow').textContent = friends.length === 1 ? `Habit · con ${friendName()}` : friends.length ? 'Habit · con tus amigos' : 'Habit · para ti y tus amigos';")
 
 # ---------- profile: account instead of sample reset ----------
 rep('''      ${state.sample ? `<div class="field"><span class="lbl">Datos de ejemplo</span>

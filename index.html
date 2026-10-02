@@ -1341,7 +1341,7 @@ function renderHeader(){
   const s = dayStats(), nm = state.profile.name;
   if (ui.tab === 'today' && !ui.page && !active().length) {
     $('backBtn').hidden = true; $('streakChip').hidden = true; $('avatarBtn').hidden = true;
-    $('eyebrow').textContent = friends.length === 1 ? `Habit · con ${friendName()}` : friends.length ? 'Habit · con tus amigos' : 'Habit · para ti y tu amigo';
+    $('eyebrow').textContent = friends.length === 1 ? `Habit · con ${friendName()}` : friends.length ? 'Habit · con tus amigos' : 'Habit · para ti y tus amigos';
     { const n = (ui.nameDraft || state.profile.name || '').trim(); $('title').textContent = (ui.onbStep || 0) === 0 || !n ? 'Hola' : 'Hola, ' + n; }
     return;
   }
@@ -1950,9 +1950,24 @@ function sheetHead(icon, color, title, sub, extra){
       <div class="txt"><div class="sh-title">${esc(title)}</div><div class="sh-sub">${sub}</div></div>
       ${extra || ''}<button class="close-x" data-act="close" aria-label="Cerrar">${X_SVG}</button></div></div>`;
 }
+/* During the first run, the ideas ticked on screen are not habits yet, but they will be:
+   they count when working out what a new habit is worth, and they are saved with it. */
+const pickedHabits = () => active().length ? [] : [...ui.picks].sort((a,b) => a-b).map(i => ({...fromIdea(i), id:'__p'+i, weight:1}));
+function addPicks(){
+  const t = todayKey(), list = [...ui.picks].sort((a,b) => a-b);
+  if (ui.nameDraft.trim()) state.profile.name = ui.nameDraft.trim().slice(0,30);
+  list.forEach((i,j) => {
+    const x = fromIdea(i);
+    state.habits.push({id:newId()+j, ...x, color:COLORS[state.habits.length%COLORS.length], weight:1, created:t});
+  });
+  ui.picks.clear(); ui.onbStep = 0;
+  return list.length;
+}
+/* What a habit would be worth today at weight w; null when it would be the only one (always 100 %). */
 function draftPct(d, w){
   const t = todayKey();
-  const others = habitsOn(t).filter(h => h.id !== d.id && freqOf(h).type !== 'weekly' && isScheduled(h,t));
+  const others = [...habitsOn(t), ...pickedHabits()].filter(h => h.id !== d.id && freqOf(h).type !== 'weekly' && isScheduled(h,t));
+  if (!others.length) return null;
   return roundedShares([...others, {id:'__d', weight:w}], t).get('__d');
 }
 /* While typing a new habit's name, matching ideas appear right under it.
@@ -2023,7 +2038,7 @@ function renderSheet(){
   } else {
     const d = ui.draft;
     const weekly = d.freq.type === 'weekly';
-    sh.innerHTML = sheetHead(hIcon(d.emoji), d.color, d.id ? 'Editar hábito' : 'Nuevo hábito', weekly ? 'Suma al 100 % los días que lo hagas' : `Vale ${draftPct(d,d.weight)} % de tu día`) + `
+    sh.innerHTML = sheetHead(hIcon(d.emoji), d.color, d.id ? 'Editar hábito' : 'Nuevo hábito', weekly ? 'Suma al 100 % los días que lo hagas' : draftPct(d,d.weight) == null ? 'Tu primer hábito del día' : `Vale ${draftPct(d,d.weight)} % de tu día`) + `
       <div class="field"><label class="lbl" for="habit-name">Nombre</label>
         <input id="habit-name" type="text" maxlength="60" placeholder="Ej. Caminar 30 minutos" value="${esc(d.name)}" autocomplete="off" enterkeyhint="done">
         ${d.id ? '' : `<div class="sugs" id="sugs">${sugsHTML(d.name)}</div>`}</div>
@@ -2039,7 +2054,7 @@ function renderSheet(){
         ${weekly ? `<div class="stepper"><button data-act="ftimes" data-d="-1" ${d.freq.times<=1?'disabled':''} aria-label="Menos veces">−</button><span class="w num">${d.freq.times}</span><button data-act="ftimes" data-d="1" ${d.freq.times>=6?'disabled':''} aria-label="Más veces">+</button><span class="u">${d.freq.times===1?'vez':'veces'} por semana</span></div>` : ''}
       </div>
       <div class="field"><span class="lbl">Importancia</span>
-        <div class="seg" style="--c:${d.color}">${LEVELS.map(([w,l]) => `<button class="${d.weight===w?'on':''}" data-act="w" data-v="${w}" aria-pressed="${d.weight===w}">${l}${weekly ? '' : `<span>${draftPct(d,w)} %</span>`}</button>`).join('')}</div>
+        <div class="seg" style="--c:${d.color}">${LEVELS.map(([w,l]) => `<button class="${d.weight===w?'on':''}" data-act="w" data-v="${w}" aria-pressed="${d.weight===w}">${l}${weekly || draftPct(d,w) == null ? '' : `<span>${draftPct(d,w)} %</span>`}</button>`).join('')}</div>
         <div class="hint">Tus hábitos del día suman 100 %. Los más importantes valen más. Los cambios aplican desde hoy.</div></div>
       <div class="field"><span class="lbl">Icono</span>
         <div class="emojis">${EMOJIS.map((e,i) => `<button class="${e===d.emoji?'on':''}" data-act="emoji" data-v="${e}" aria-label="Icono ${i+1}" aria-pressed="${e===d.emoji}">${hIcon(e)}</button>`).join('')}</div></div>
@@ -2070,11 +2085,12 @@ function saveHabit(){
   const freq = cleanFreq(d.freq);
   const kind = d.kind, amount = kind === 'amount' ? {unit:d.amount.unit, goal:d.amount.goal} : null;
   const ask = kind === 'amount' && d.askOn ? {set:d.askSet, ...(d.askQ ? {q:d.askQ} : {})} : null;
+  const withPicks = !d.id && !active().length && ui.picks.size ? addPicks() : 0;
   if (d.id) Object.assign(state.habits.find(h => h.id === d.id), {name, emoji:d.emoji, color:d.color, weight:d.weight, freq, kind, amount, ask});
   else state.habits.push({id:newId(), name, emoji:d.emoji, color:d.color, weight:d.weight, freq, created:todayKey(), kind, amount, ask});
   const wasNew = !d.id;
   save(); ui.sheet = null; closeSheetUI(); render();
-  toast(wasNew ? `${name} añadido` : 'Cambios guardados');
+  toast(withPicks ? `Listo: ${withPicks + 1} hábitos para empezar` : wasNew ? `${name} añadido` : 'Cambios guardados');
 }
 
 /* ---------- drag the sheet down to close ---------- */
@@ -2161,13 +2177,7 @@ document.addEventListener('click', e => {
     case 'onb-back': ui.onbStep = 0; render(); break;
     case 'pick': { const i = +b.dataset.i; ui.picks.has(i) ? ui.picks.delete(i) : ui.picks.add(i); buzz(8); renderSections(); renderScore(); break; }
     case 'add-picks': {
-      const t = todayKey();
-      if (ui.nameDraft.trim()) state.profile.name = ui.nameDraft.trim().slice(0,30);
-      [...ui.picks].sort((a,b) => a-b).forEach((i,j) => {
-        const x = fromIdea(i);
-        state.habits.push({id:newId()+j, ...x, color:COLORS[state.habits.length%COLORS.length], weight:1, created:t});
-      });
-      const n = ui.picks.size; ui.picks.clear(); ui.onbStep = 0; save(); render();
+      const n = addPicks(); save(); render();
       toast(state.profile.name ? `Listo, ${state.profile.name}. Toca el primero.` : `${n} ${n===1?'hábito añadido':'hábitos añadidos'}. Toca el primero.`);
       break;
     }
