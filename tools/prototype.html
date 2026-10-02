@@ -1,17 +1,3 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0D0F12">
-<meta name="description" content="Tus hábitos del día, con tu amigo.">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="apple-touch-icon" href="icons/icon-180.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Habit">
 <title>Habit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -756,48 +742,7 @@ body.onboarding .tabbar,body.onboarding #score,body.onboarding #reviewSlot{displ
 .prog.perfect.idle .climb .walker{animation:cheer 2.6s ease-in-out infinite!important}
 .prog.perfect.idle .climb .arms{animation:cheer-arms 2.6s ease-in-out infinite!important}
 .prog.perfect.idle .climb .cloth{animation:wave 1.6s ease-in-out infinite!important}
-
-/* ---------- splash + login ---------- */
-.splash{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:var(--bg);transition:opacity .35s var(--ease)}
-.splash.out{opacity:0;pointer-events:none}
-.splash-mark{font-family:var(--display);font-stretch:125%;font-weight:900;font-size:34px;letter-spacing:-.01em;color:var(--fg);animation:viewin .5s var(--ease)}
-.auth{position:fixed;inset:0;z-index:70;overflow:auto;background:var(--bg);display:flex;flex-direction:column}
-.auth-art{position:relative;height:min(42vh,320px);flex:none;overflow:hidden}
-.auth-art svg{position:absolute;inset:0;width:100%;height:100%}
-.auth-art::after{content:"";position:absolute;inset:auto 0 0 0;height:40%;background:linear-gradient(transparent,var(--bg))}
-.auth-in{width:min(440px,100%);margin:0 auto;padding:0 20px calc(28px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px;flex:1;animation:viewin .35s var(--ease)}
-.auth-brand{font-family:var(--display);font-stretch:125%;font-weight:900;font-size:15px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
-.auth h1{margin:0;font-family:var(--display);font-stretch:118%;font-weight:900;font-size:34px;line-height:1.02;letter-spacing:-.01em}
-.auth p{margin:0;color:var(--muted);font-size:15px;line-height:1.45}
-.auth p b{color:var(--fg)}
-.auth input{width:100%;font:inherit;font-size:17px;color:var(--fg);background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px;outline:none}
-.auth input:focus{border-color:var(--accent)}
-.auth input.code{font-family:var(--display);font-stretch:125%;font-weight:800;font-size:30px;letter-spacing:.42em;text-align:center;padding:14px 0 14px .42em}
-.auth .field{gap:8px;margin-top:6px}
-.auth-err{min-height:20px;color:#FF8A8A;font-size:14px;font-weight:600}
-.auth-links{display:flex;justify-content:space-between;gap:12px}
-.link{color:var(--muted);font-weight:700;font-size:14px;padding:10px 0;text-decoration:underline;text-underline-offset:3px}
-.link:disabled{opacity:.45;text-decoration:none}
-.auth-foot{margin-top:auto;padding-top:18px;color:var(--faint);font-size:13px;text-align:center}
-.btn.loading{opacity:.6;pointer-events:none}
-/* ---------- invite (no friend yet) ---------- */
-.invite{display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:26px 18px 22px;border-radius:26px;background:var(--surface);border:1px solid var(--line)}
-.invite svg.pair{width:150px;height:84px}
-.invite h3{margin:0;font-family:var(--display);font-stretch:118%;font-weight:900;font-size:24px;line-height:1.1}
-.invite p{margin:0;color:var(--muted);font-size:15px;line-height:1.45;max-width:32ch}
-.invite .btn{margin-top:6px}
-.acct{color:var(--muted);font-size:14px;word-break:break-all}
-/* ---------- friends: one pair each, pick who to look at ---------- */
-.fpick{margin-bottom:-6px}
-.fpick .fchip{display:inline-flex;align-items:center;gap:7px;padding:6px 14px 6px 6px}
-.fpick .fchip .avatar{width:26px;height:26px;border-radius:9px;font-size:12px}
-.fpick .fchip.on .avatar.f{background:var(--ink);color:var(--fg);box-shadow:none}
-.fpick .fchip.add{padding:6px 14px;color:var(--muted)}
-.fpick .fchip.add svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
-.unfriend{display:block;margin:4px auto 0}
 </style>
-</head>
-<body>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -808,8 +753,6 @@ body.onboarding .tabbar,body.onboarding #score,body.onboarding #reviewSlot{displ
   </defs>
 </svg>
 
-<div class="splash" id="splash" aria-hidden="true"><div class="splash-mark">Habit</div></div>
-<div class="auth" id="auth" hidden></div>
 <div class="app">
   <header class="top">
     <button class="back-btn" id="backBtn" data-act="back" aria-label="Volver" hidden><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -886,9 +829,8 @@ body.onboarding .tabbar,body.onboarding #score,body.onboarding #reviewSlot{displ
 <div class="celebrate" id="celebrate" hidden role="dialog" aria-modal="true" aria-labelledby="celNum"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-<script type="module">
-import * as cloud from './cloud.js';
-(async function(){
+<script>
+(function(){
 const KEY = 'ritmo-v1', TIP_KEY = 'ritmo-tip-seen-2';
 const COLORS = ['#3987e5','#d95926','#199e70','#c98500','#d55181','#8a63d2'];
 const ACCENTS = ['#34D399','#8B7CFF','#C8F04A','#4DA3FF','#FF7A3D'];
@@ -981,6 +923,93 @@ const fmtShort = k => parseKey(k).toLocaleDateString('es', {weekday:'short', day
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 
 /* ---------- seed data ---------- */
+function rng(seed){ let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+function fillLog(habits, start, t, rnd, notes, todayLog){
+  const log = {};
+  for (let k = start; k < t; k = addDays(k,1)) {
+    const allIn = rnd() < 0.42;
+    log[k] = {};
+    habits.forEach((h,i) => {
+      const f = h.freq;
+      let did;
+      if (f.type === 'weekly') {
+        const ws = weekStart(k); let c = 0;
+        for (let d = ws; d < k; d = addDays(d,1)) if (log[d] && log[d][h.id]) c++;
+        did = c < f.times && rnd() < 0.5;
+      } else if (f.type === 'days' && !f.days.includes(dowOf(k))) did = false;
+      else did = allIn || rnd() < 0.55 + i*0.05;
+      if (did) {
+        const pool = notes[h.id];
+        log[k][h.id] = {done:true, note: pool && rnd() < 0.35 ? pool[Math.floor(rnd()*pool.length)] : ''};
+      }
+    });
+  }
+  for (let i = 1; i <= 4; i++) {
+    const k = addDays(t,-i);
+    habits.forEach(h => { const f = h.freq; if (f.type === 'daily' || (f.type === 'days' && f.days.includes(dowOf(k)))) log[k][h.id] = log[k][h.id] || {done:true, note:''}; });
+  }
+  log[t] = todayLog;
+  return log;
+}
+/* Sample measurements: amounts for every scheduled day, answers where they apply. */
+function addMeasures(habits, log, start, t, rnd){
+  const pick = a => a[Math.floor(rnd()*a.length)];
+  for (let k = start; k < t; k = addDays(k,1)) {
+    const day = log[k] || (log[k] = {});
+    const others = habits.filter(h => h.kind !== 'amount' && h.freq.type === 'daily');
+    const goodDay = others.every(h => day[h.id] && day[h.id].done);
+    habits.forEach(h => {
+      const f = h.freq, scheduled = f.type === 'daily' || (f.type === 'days' && f.days.includes(dowOf(k)));
+      if (h.kind === 'amount' && scheduled) {
+        const g = h.amount.goal, u = h.amount.unit;
+        let met = day[h.id] && day[h.id].done;
+        if (u === 'h') {
+          const band = (goodDay ? rnd() < .85 : rnd() < .3) ? 2 : pick([1,1,1,0]);
+          day[h.id] = {...(day[h.id] || {note:''}), band, done: band === 2};
+          const e0 = day[h.id]; if (h.ask) e0.answer = band === 2 ? pick([2,2,3]) : pick([0,1,1]);
+          return;
+        }
+        const v = met ? (u === 'h' ? pick([7.5,8,8,8.5,9]) : u === 'pag' ? pick([20,25,30]) : g)
+                      : (u === 'h' ? pick([4.5,5.5,6,6.5,7]) : u === 'pag' ? pick([0,5,10,15]) : pick([3,4,5,6,7]));
+        const prev = day[h.id] || {note:''};
+        day[h.id] = {...prev, value:v, done: v >= g};
+        if (!v && !prev.note) delete day[h.id];
+      }
+      const e = day[h.id];
+      if (e && h.ask) e.answer = h.ask.set === 'calidad' ? (sleepScore(e.value) === 1 ? pick([2,2,3]) : pick([0,1,1])) : pick([0,1,2]);
+    });
+  }
+}
+function seed(){
+  const t = todayKey(), start = addDays(t,-48);
+  const habits = [
+    {id:'h1', name:'Meditar 10 minutos', emoji:'🧘', color:COLORS[5], weight:1, created:start, freq:{type:'daily'}, kind:'check'},
+    {id:'h2', name:'Leer 20 páginas', emoji:'📖', color:COLORS[3], weight:1, created:start, freq:{type:'days', days:[1,2,3,4,5]}, kind:'check'},
+    {id:'h3', name:'Ir al gimnasio', emoji:'💪', color:COLORS[1], weight:2, created:start, freq:{type:'weekly', times:3}, kind:'check'},
+    {id:'h4', name:'Beber 2 L de agua', emoji:'💧', color:COLORS[0], weight:1, created:start, freq:{type:'daily'}, kind:'check'},
+    {id:'h5', name:'Dormir', emoji:'🛏️', color:COLORS[2], weight:1, created:start, freq:{type:'daily'}, kind:'amount', amount:{unit:'h', goal:8}, ask:{set:'calidad', q:'¿Cómo dormiste?'}}
+  ];
+  const notes = {h3:['Pierna y core','Espalda, 45 min','Cardio suave'], h2:['Cap. 4 terminado','Leí en el metro'], h1:['Con respiración guiada','Me costó concentrarme']};
+  const log = fillLog(habits, start, t, rng(7), notes, {h1:{done:true, note:'Sesión de la mañana, muy tranquila'}, h4:{done:true, note:''}, h5:{done:false, band:1, answer:1}});
+  addMeasures(habits, log, start, t, rng(99));
+  return {habits, log, sample:true, v3:true, v4:true, v5:true, frozen:{}, profile:{name:'', accent:ACCENTS[0]}};
+}
+function seedFriend(){
+  const t = todayKey(), start = addDays(t,-30);
+  const habits = [
+    {id:'f1', name:'Inglés 15 minutos', emoji:'🧠', color:COLORS[5], weight:1, created:start, freq:{type:'daily'}},
+    {id:'f2', name:'Salir a correr', emoji:'🏃', color:COLORS[0], weight:2, created:start, freq:{type:'weekly', times:3}},
+    {id:'f3', name:'Beber 2 L de agua', emoji:'💧', color:COLORS[0], weight:1, created:start, freq:{type:'daily'}, kind:'check'},
+    {id:'f4', name:'Dormir', emoji:'🛏️', color:COLORS[2], weight:1, created:start, freq:{type:'daily'}, kind:'amount', amount:{unit:'h', goal:8}, ask:{set:'calidad', q:'¿Cómo dormiste?'}},
+    {id:'f5', name:'Escribir un diario', emoji:'✍️', color:COLORS[1], weight:1, created:start, freq:{type:'days', days:[1,3,5]}}
+  ];
+  const notes = {f2:['6 km por el parque','Series, durísimo','10 km, récord personal'], f1:['Podcast en el bus','Duolingo y una serie en inglés']};
+  const flog = fillLog(habits, start, t, rng(1234), notes, {f1:{done:true, note:'Repasé verbos irregulares', at:Date.now()-38*60000}, f2:{done:true, note:'5 km antes del trabajo, me costó arrancar', at:Date.now()-150*60000}, f3:{done:true, note:'', at:Date.now()-95*60000}, f4:{done:true, band:2, answer:3, at:Date.now()-400*60000}});
+  const s = {habits, log:flog, sample:true, frozen:{}, profile:{name:'Tu amigo', accent:FRIEND_COLOR}};
+  addMeasures(habits, flog, start, t, rng(4321));
+  return s;
+}
+
 /* ---------- state ---------- */
 function normalize(s){
   s.frozen = s.frozen || {};
@@ -998,12 +1027,19 @@ function normalize(s){
   });
   return s;
 }
-function save(){ return sync ? sync.save(state) : true; }
+function load(){
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (raw) { const s = JSON.parse(raw); if (s.sample && !s.v5) { const n = seed(); n.profile = {...n.profile, ...s.profile}; return n; } return normalize(s); }
+  } catch(e){}
+  return null;
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(state)); return true; } catch(e){ return false; } }
 function tipSeen(){ try { return localStorage.getItem(TIP_KEY) === '1'; } catch(e){ return false; } }
 function markTipSeen(){ try { localStorage.setItem(TIP_KEY,'1'); } catch(e){} }
 
-const emptyState = () => ({habits:[], log:{}, frozen:{}, profile:{name:'', accent:ACCENTS[0], accentSet:true}});
-let state = emptyState(), friends = [], friend = null, sync = null, me = null;
+let state = load() || seed();
+const friend = seedFriend();
 function withState(S, fn){ const prev = state; state = S; try { return fn(); } finally { state = prev; } }
 let lastToday = todayKey();
 const ui = {tab:'today', day:lastToday, month:lastToday.slice(0,7), sheet:null, draft:null, noteDraft:'', photoDraft:[], busy:0, confirmDelete:false, confirmReset:false, pop:null, shownPct:0, picks:new Set(), nameDraft:'', showOff:false, feedDays:2, friendFeedDays:2};
@@ -1014,18 +1050,7 @@ const habitsOn = k => state.habits.filter(h => h.created <= k && !(h.archivedAt 
 const active = () => state.habits.filter(h => !h.archivedAt);
 const entry = (k,id) => state.log[k] && state.log[k][id];
 const isDone = (k,id) => !!(entry(k,id) && entry(k,id).done);
-const rawPhotos = e => (e && e.photos) || [];
-const photosOf = e => rawPhotos(e).map(p => cloud.photoURL(p, photosReady));
-let photoTimer = null;
-function photosReady(){
-  clearTimeout(photoTimer);
-  photoTimer = setTimeout(() => {
-    render();
-    if (!ui.sheet) return;
-    if (ui.sheet.mode === 'note') document.querySelectorAll('.photo-row .ph img').forEach((img,i) => { img.src = cloud.photoURL(ui.photoDraft[i], photosReady); });
-    else renderSheet();
-  }, 20);
-}
+const photosOf = e => (e && e.photos) || [];
 const freqOf = h => h.freq || {type:'daily'};
 const isScheduled = (h,k) => { const f = freqOf(h); return f.type === 'daily' || (f.type === 'days' && f.days.includes(dowOf(k))); };
 /* A habit counts toward a day's 100 % when it is scheduled that day, or when it was done that day (weekly habits, extra days). */
@@ -1106,7 +1131,7 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>'
 const $ = id => document.getElementById(id);
 const buzz = p => { try { navigator.vibrate && navigator.vibrate(p || 12); } catch(e){} };
 const dayLabel = k => { const t = todayKey(); return k === t ? 'hoy' : k === addDays(t,-1) ? 'ayer' : fmtLong(k); };
-const newId = () => crypto.randomUUID();
+const newId = () => 'h' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
 const initial = n => (n || '').trim().charAt(0).toUpperCase();
 
 /* ---------- photos ---------- */
@@ -1341,7 +1366,7 @@ function renderHeader(){
   const s = dayStats(), nm = state.profile.name;
   if (ui.tab === 'today' && !ui.page && !active().length) {
     $('backBtn').hidden = true; $('streakChip').hidden = true; $('avatarBtn').hidden = true;
-    $('eyebrow').textContent = friends.length === 1 ? `Habit · con ${friendName()}` : friends.length ? 'Habit · con tus amigos' : 'Habit · para ti y tu amigo';
+    $('eyebrow').textContent = 'Habit · para ti y tu amigo';
     { const n = (ui.nameDraft || state.profile.name || '').trim(); $('title').textContent = (ui.onbStep || 0) === 0 || !n ? 'Hola' : 'Hola, ' + n; }
     return;
   }
@@ -1362,7 +1387,7 @@ function renderHeader(){
   av.hidden = ui.tab !== 'log';
   av.innerHTML = nm ? esc(initial(nm)) : USER_SVG;
   if (ui.tab === 'log') { $('eyebrow').textContent = nm ? `El diario de ${nm}` : 'Tu diario'; $('title').textContent = 'Registro'; return; }
-  if (ui.tab === 'friend') { $('eyebrow').textContent = friend ? 'Tu amigo' : 'Juntos'; $('title').textContent = friend ? friendName() : 'Tu amigo'; return; }
+  if (ui.tab === 'friend') { $('eyebrow').textContent = 'Vista previa'; $('title').textContent = 'Tu amigo'; return; }
   $('eyebrow').textContent = fmtShort(todayKey());
   $('title').textContent = 'Hoy';
 }
@@ -1643,7 +1668,6 @@ function renderLog(){
 function dayStatus(S, k){ return withState(S, () => k < firstKey() ? 'none' : isFull(k) ? 'full' : isRest(k) ? 'rest' : 'open'); }
 /* A day counts for the shared streak only when both completed it (a rest day is neutral for that person). */
 function bothDone(k){
-  if (!friend) return null;
   const a = dayStatus(state,k), b = dayStatus(friend,k);
   if (a === 'none' || b === 'none') return null;
   if (a === 'rest' && b === 'rest') return 'skip';
@@ -1662,7 +1686,6 @@ function sharedStreak(){
 }
 /* "News" = friend activity with a note or photo, or a completed day, since you last opened the Amigo tab. */
 function friendNews(since){
-  if (!friend) return 0;
   const t = todayKey(), items = [];
   withState(friend, () => {
     [t, addDays(t,-1)].forEach(k => habitsOn(k).forEach(h => {
@@ -1677,26 +1700,7 @@ function ago(ms){
   const m = Math.max(1, Math.round((Date.now() - ms) / 60000));
   return m < 60 ? `hace ${m} min` : `hace ${Math.round(m/60)} h`;
 }
-const friendName = () => (friend && friend.profile.name) || 'Tu amigo';
-const PAIR_SVG = `<svg class="pair" viewBox="0 0 150 84" aria-hidden="true"><path d="M44 58 C64 30 86 30 106 58" fill="none" stroke="var(--faint)" stroke-width="2.5" stroke-dasharray="1 7" stroke-linecap="round"/><circle cx="34" cy="50" r="22" fill="var(--accent)"/><circle cx="116" cy="50" r="22" fill="var(--surface-2)" stroke="var(--faint)" stroke-width="2" stroke-dasharray="4 5"/><path d="M116 42v16M108 50h16" stroke="var(--muted)" stroke-width="2.6" stroke-linecap="round"/><g fill="var(--ink)"><circle cx="34" cy="44" r="6"/><path d="M23 62c2-6 6-9 11-9s9 3 11 9"/></g></svg>`;
-function renderInvite(){
-  $('view-friend').innerHTML = `<div class="invite">
-    ${PAIR_SVG}
-    <h3>Hagan hábitos juntos</h3>
-    <p>Invita a tu amigo. Verán el día del otro, sus notas y fotos, y tendrán una racha que solo sube si los dos cumplen.</p>
-    <button class="btn wide" data-act="invite">Invitar a mi amigo</button>
-    <div class="hint">Cuando entre con tu enlace, aparecerá aquí. Puedes invitar a más de un amigo: cada uno ve tu día, pero no el de los otros.</div>
-  </div>`;
-}
-/* Each friendship is its own pair. Chips pick whose day is on screen; "Invitar" adds another pair. */
-function withFriend(f, fn){ const prev = friend; friend = f; try { return fn(); } finally { friend = prev; } }
-function friendPicker(){
-  return `<div class="filters fpick" role="tablist" aria-label="Tus amigos">${friends.map(f => `<button class="fchip${f === friend ? ' on' : ''}" data-act="pick-friend" data-id="${esc(f.id)}" role="tab" aria-selected="${f === friend}"><span class="avatar f">${esc(initial(f.profile.name) || 'A')}</span>${esc(f.profile.name || 'Tu amigo')}</button>`).join('')}<button class="fchip add" data-act="invite">${PLUS_SVG}Invitar</button></div>`;
-}
-const unfriendHTML = name => `<button class="link unfriend" data-act="unfriend" data-id="${esc(friend.id)}">${ui.confirmUnfriend === friend.id ? `¿Seguro? Toca otra vez para dejar de ser amigos con ${esc(name)}` : `Dejar de ser amigos con ${esc(name)}`}</button>`;
 function renderFriend(){
-  if (!friend) return renderInvite();
-  const fname = friendName();
   const t = todayKey(), since = ui.friendPrevSeen || 0;
   const me = dayStats(), myName = state.profile.name || 'Tú';
   const shared = sharedStreak();
@@ -1704,8 +1708,8 @@ function renderFriend(){
   const html = withState(friend, () => {
     const s = dayStats(), p = Math.round(dayPct(t)*100), frDone = isFull(t) || isRest(t);
     const status = meDone && frDone ? `Sumaron el día. Racha juntos: ${shared}.`
-      : meDone ? `Ya cumpliste. Falta ${fname} para sumar el día ${shared + 1}.`
-      : frDone ? `${fname} ya cumplió. Te falta a ti para sumar el día ${shared + 1}.`
+      : meDone ? `Ya cumpliste. Falta tu amigo para sumar el día ${shared + 1}.`
+      : frDone ? `Tu amigo ya cumplió. Te falta a ti para sumar el día ${shared + 1}.`
       : `Hoy faltan los dos para sumar el día ${shared + 1}.`;
     const shown = habitsOn(t).filter(h => isScheduled(h,t) || isDone(t,h.id) || freqOf(h).type === 'weekly');
     const rows = shown.map(h => {
@@ -1728,14 +1732,14 @@ function renderFriend(){
           <div><div class="hero-num num">${shared}</div><div class="hero-lbl">${shared === 1 ? 'día' : 'días'} juntos al 100 %</div><div class="hero-sub">Solo sube si los dos cumplen.</div></div>
           <div class="hero-flame">${flame()}</div>
         </div>
-        <div class="tg">${row({l: initial(myName) || 'T'}, myName, myP, meDone)}${row({l:initial(fname) || 'A', f:true}, fname, p, frDone)}</div>
+        <div class="tg">${row({l: initial(myName) || 'T'}, myName, myP, meDone)}${row({l:'A', f:true}, 'Tu amigo', p, frDone)}</div>
         <div class="next"><span>${esc(status)}</span></div>
       </div>
-      <div class="hint" style="text-align:center;margin-top:-8px">Rachas individuales: ${esc(myName === 'Tú' ? 'tú' : myName)} ${me.cur} · ${esc(fname)} ${s.cur}</div>
+      <div class="hint" style="text-align:center;margin-top:-8px">Rachas individuales: ${esc(myName === 'Tú' ? 'tú' : myName)} ${me.cur} · tu amigo ${s.cur}</div>
       <div class="sec"><div class="sec-head"><h2>Su día</h2><span class="tag">${p} %</span></div><div class="list">${rows}</div></div>
       <div class="sec"><div class="sec-head"><h2>Días anteriores</h2></div><div class="feed">${feedHTML(ui.friendFeedDays,'friend', addDays(t,-1))}</div></div>`;
   });
-  $('view-friend').innerHTML = friendPicker() + html + unfriendHTML(fname);
+  $('view-friend').innerHTML = html;
 }
 
 function render(){
@@ -1746,7 +1750,7 @@ function render(){
   if (view !== ui.lastView) { const v = $('view-' + view); v.classList.remove('enter'); void v.offsetWidth; v.classList.add('enter'); ui.lastView = view; }
   ['today','log','friend','history'].forEach(v => { $('view-'+v).hidden = view !== v; });
   document.querySelectorAll('.tab').forEach(b => { const on = b.dataset.tab === ui.tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
-  const news = ui.tab === 'friend' ? 0 : friends.reduce((n, f) => n + withFriend(f, () => friendNews(state.friendSeenAt || 0)), 0);
+  const news = ui.tab === 'friend' ? 0 : friendNews(state.friendSeenAt || 0);
   const ft = document.querySelector('.tab[data-tab="friend"]');
   ft.classList.toggle('news', news > 0);
   ft.setAttribute('aria-label', news > 0 ? 'Amigo, hay novedades' : 'Amigo');
@@ -1855,22 +1859,15 @@ function showCelebration(cur){
   }).join('');
   const next = MILESTONES.find(m => m > cur);
   const msg = MILESTONES.includes(cur) ? `¡Nuevo logro: ${cur} días seguidos!` : next ? `Mañana serían ${cur + 1}. Próximo logro: ${next} días.` : 'Sigue así.';
-  let fr = '';
-  if (friends.length === 1) withFriend(friends[0], () => {
-    const frDone = withState(friend, () => isFull(t) || isRest(t)), frP = withState(friend, () => Math.round(dayPct(t)*100));
-    fr = frDone ? `${friendName()} también cumplió. Racha juntos: ${sharedStreak()}.` : `${friendName()} va al ${frP} %. Falta para sumar juntos.`;
-  });
-  else if (friends.length > 1) {
-    const done = friends.filter(f => withState(f, () => isFull(t) || isRest(t))).length;
-    fr = done ? `${done} de ${friends.length} amigos también cumplieron hoy.` : 'Tus amigos todavía no completan su día.';
-  }
+  const frDone = withState(friend, () => isFull(t) || isRest(t)), frP = withState(friend, () => Math.round(dayPct(t)*100));
+  const fr = frDone ? `Tu amigo también cumplió. Racha juntos: ${sharedStreak()}.` : `Tu amigo va al ${frP} %. Falta él para sumar juntos.`;
   el.innerHTML = `<div class="cel-in">
       <div class="cel-flame">${flame()}</div>
       <div class="cel-num num" id="celNum">${Math.max(0, cur - 1)}</div>
       <div class="cel-lbl">${cur === 1 ? 'día de racha' : 'días de racha'}</div>
       <div class="cel-week">${week}</div>
       <p class="cel-msg">${esc(msg)}</p>
-      ${fr ? `<p class="cel-fr">${esc(fr)}</p>` : ''}
+      <p class="cel-fr">${esc(fr)}</p>
     </div>
     <button class="btn cel-btn" data-act="cel-close">Continuar</button>`;
   el.hidden = false;
@@ -1896,7 +1893,7 @@ function hideToast(){ $('toast').classList.remove('show'); toastActs = []; }
 function openSheet(s){
   hideToast();
   ui.sheet = s; ui.confirmDelete = false;
-  if (s.mode === 'note') { const e = entry(s.day,s.id) || {}; ui.noteDraft = e.note || ''; ui.photoDraft = [...rawPhotos(e)]; }
+  if (s.mode === 'note') { const e = entry(s.day,s.id) || {}; ui.noteDraft = e.note || ''; ui.photoDraft = [...photosOf(e)]; }
   if (s.mode === 'profile') ui.nameDraft = state.profile.name || '';
   renderSheet();
   const b = $('backdrop'), sh = $('sheet');
@@ -1908,7 +1905,7 @@ function commitNote(){
   const s = ui.sheet; if (!s || s.mode !== 'note' || !isToday(s.day)) return null;
   const note = ui.noteDraft.trim(), photos = [...ui.photoDraft];
   const prev = entry(s.day,s.id) || {done:false, note:'', photos:[]};
-  if (note === (prev.note || '') && JSON.stringify(photos) === JSON.stringify(rawPhotos(prev))) return null;
+  if (note === (prev.note || '') && JSON.stringify(photos) === JSON.stringify(photosOf(prev))) return null;
   const hasContent = !!note || photos.length > 0;
   const h0 = state.habits.find(x => x.id === s.id);
   const autoDone = hasContent && !prev.done && kindOf(h0) === 'check';
@@ -1966,7 +1963,7 @@ function sugsHTML(q){
   return hits.map(([[e,n,f],i]) => `<button class="sug" data-act="idea" data-i="${i}">${hIcon(e,'sm')}<b>${esc(n)}</b><span>${esc(freqLabel(f))}</span></button>`).join('');
 }
 function photoRowHTML(compact){
-  return `<div class="photo-row${compact ? ' compact' : ''}">${ui.photoDraft.map((src,i) => `<div class="ph"><img src="${cloud.photoURL(src, photosReady)}" alt="Foto ${i+1}" data-act="photo"><button class="rm" data-act="rm-photo" data-i="${i}" aria-label="Quitar foto">${X_SVG}</button></div>`).join('')}
+  return `<div class="photo-row${compact ? ' compact' : ''}">${ui.photoDraft.map((src,i) => `<div class="ph"><img src="${src}" alt="Foto ${i+1}" data-act="photo"><button class="rm" data-act="rm-photo" data-i="${i}" aria-label="Quitar foto">${X_SVG}</button></div>`).join('')}
     ${Array.from({length:ui.busy}, () => '<div class="ph busy">Cargando…</div>').join('')}
     ${ui.photoDraft.length + ui.busy < MAX_PHOTOS ? `<label class="ph add" for="photo-input" tabindex="0" aria-label="Añadir foto">${CAM_SVG}<span>Añadir foto</span></label>` : ''}</div>`;
 }
@@ -1985,7 +1982,7 @@ function renderSheet(){
         <textarea id="note-input" placeholder="¿Cómo te fue? Tiempo, cantidad, sensaciones…">${esc(ui.noteDraft)}</textarea>
         <div class="chips">${['Fácil','Me costó','Con compañía'].map(c => `<button class="chip" data-act="chip" data-chip="${c}">${c}</button>`).join('')}</div>
       </div>`}
-      <div class="shared-hint">${EYE_SVG}<span>${friends.length > 1 ? 'Tus amigos verán' : 'Tu amigo verá'} tus notas y fotos.${done || kindOf(h) !== 'check' ? '' : ' Si añades algo, se marca como hecho.'}</span></div>
+      <div class="shared-hint">${EYE_SVG}<span>Tu amigo verá tus notas y fotos.${done || kindOf(h) !== 'check' ? '' : ' Si añades algo, se marca como hecho.'}</span></div>
       <div class="actions"><button class="btn" data-act="close">Listo</button></div>`;
   } else if (s.mode === 'review') {
     sh.innerHTML = reviewHTML();
@@ -2015,9 +2012,8 @@ function renderSheet(){
       <div class="field"><span class="lbl">Tu color</span>
         <div class="colors">${ACCENTS.map(c => `<button class="${c===state.profile.accent?'on':''}" style="--sw:${c}" data-act="accent" data-v="${c}" aria-label="Color ${c}"></button>`).join('')}</div>
         <div class="hint">Pinta tu racha, tus días perfectos y tu sello.</div></div>
-      <div class="field"><span class="lbl">Cuenta</span>
-        <div class="acct">${esc((me && me.email) || '')}${friends.length ? ` · conectado con ${esc(friends.map(f => f.profile.name || 'Tu amigo').join(', '))}` : ''}</div>
-        <button class="btn ghost wide" data-act="signout">Cerrar sesión</button></div>
+      ${state.sample ? `<div class="field"><span class="lbl">Datos de ejemplo</span>
+        <button class="btn danger wide" data-act="reset">${ui.confirmReset ? '¿Seguro? Toca otra vez' : 'Borrar ejemplos y empezar de cero'}</button></div>` : ''}
       <div class="actions"><button class="btn" data-act="close">Listo</button></div>`;
     const ico = sh.querySelector('.sh-head .ico'); if (ico) { ico.style.background = 'var(--accent)'; ico.style.borderColor = 'var(--accent)'; }
   } else {
@@ -2222,24 +2218,6 @@ document.addEventListener('click', e => {
       toast(`${h.name} eliminado`, [{label:'Deshacer', fn:() => { delete h.archivedAt; save(); render(); }}]);
       break;
     }
-    case 'signout':
-      b.classList.add('loading');
-      sync.flush().catch(() => {}).then(() => cloud.signOut(me.id)).finally(() => location.reload());
-      break;
-    case 'invite': shareInvite(b); break;
-    case 'pick-friend':
-      friend = friends.find(f => f.id === b.dataset.id) || friend; ui.friendId = friend && friend.id; ui.confirmUnfriend = null;
-      render(); window.scrollTo({top:0}); break;
-    case 'unfriend': {
-      const id = b.dataset.id, f = friends.find(x => x.id === id); if (!f) break;
-      if (ui.confirmUnfriend !== id) { ui.confirmUnfriend = id; render(); break; }
-      b.classList.add('loading');
-      cloud.removeFriend(id).then(refreshFriends).then(() => {
-        ui.confirmUnfriend = null; render(); window.scrollTo({top:0});
-        toast(`Ya no eres amigo de ${f.profile.name || 'esa persona'}`);
-      }).catch(() => { b.classList.remove('loading'); toast('No se pudo. Revisa tu internet.'); });
-      break;
-    }
     case 'reset':
       if (!ui.confirmReset) { ui.confirmReset = true; renderSheet(); return; }
       ui.confirmReset = false;
@@ -2261,151 +2239,14 @@ function checkNewDay(){
     ui.sheet = null; closeSheetUI();
   }
   lastToday = t;
-  freezePast(); friends.forEach(f => withState(f, freezePast)); save(); render();
+  freezePast(); withState(friend, freezePast); save(); render();
   toast('Nuevo día. El de ayer quedó guardado.');
 }
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkNewDay(); });
 setInterval(checkNewDay, 30000);
 
-/* ---------- cuenta, amigo y arranque ---------- */
-const INVITE_KEY = 'ritmo-invite';
-/* The login reuses the day's mountain: same drawing, own gradient ids, no climber yet. */
-const AUTH_ART = `<svg class="climb" viewBox="0 0 360 150" preserveAspectRatio="xMidYMax slice" aria-hidden="true">${$('climb').innerHTML
-  .replace(/<path class="trail-done"[^>]*>(<\/path>)?/, '').replace(/<g class="climber"[\s\S]*<\/g>\s*<\/g>/, '')
-  .replace(/id="([^"]+)"/g, 'id="au-$1"').replace(/url\(#/g, 'url(#au-')}</svg>`;
-let offlineShown = false;
-function setSyncStatus(st){
-  if (st === 'offline' && !offlineShown) { offlineShown = true; toast('Sin conexión. Se guardará cuando vuelva.'); }
-  if (st === 'saved') offlineShown = false;
-}
-function hideSplash(){ const sp = $('splash'); sp.classList.add('out'); setTimeout(() => { sp.hidden = true; }, 400); }
-function authScreen(html){ const a = $('auth'); a.hidden = false; a.innerHTML = `<div class="auth-art">${AUTH_ART}</div><div class="auth-in">${html}</div>`; hideSplash(); return a; }
-const AUTH_ERRORS = [[/rate|seconds|too many/i, 'Espera un momento antes de pedir otro código.'], [/expired|invalid|token/i, 'Ese código no es correcto o ya venció.'], [/email/i, 'Revisa que el correo esté bien escrito.']];
-const authMsg = err => (AUTH_ERRORS.find(([re]) => re.test((err && err.message) || '')) || [0, 'No se pudo conectar. Revisa tu internet.'])[1];
-/* Login sin contraseña: correo → código de 6 dígitos. Resuelve con el usuario. */
-function authFlow(){
-  return new Promise(resolve => {
-    let email = '';
-    try { email = localStorage.getItem('ritmo-email') || ''; } catch(e) {}
-    const invited = (() => { try { return !!localStorage.getItem(INVITE_KEY); } catch(e) { return false; } })();
-    const stepEmail = () => {
-      const a = authScreen(`<div class="auth-brand">Habit</div>
-        <h1>${invited ? 'Te invitaron a Habit' : 'Tus hábitos, con tus amigos.'}</h1>
-        <p>${invited ? 'Entra con tu correo y quedarán conectados.' : 'Marca tu día, sube la montaña y mantengan la racha juntos.'}</p>
-        <div class="field"><label class="lbl" for="au-email">Tu correo</label>
-          <input id="au-email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" placeholder="tu@correo.com" value="${esc(email)}" enterkeyhint="send"></div>
-        <div class="auth-err" id="au-err" role="alert"></div>
-        <button class="btn wide" id="au-send">Enviarme un código</button>
-        <div class="auth-foot">Sin contraseñas. Te llega un código de 6 dígitos.</div>`);
-      const inp = a.querySelector('#au-email'), btn = a.querySelector('#au-send'), err = a.querySelector('#au-err');
-      const go = async () => {
-        email = inp.value.trim().toLowerCase();
-        if (!/^\S+@\S+\.\S+$/.test(email)) { err.textContent = 'Escribe un correo válido.'; inp.focus(); return; }
-        btn.classList.add('loading'); err.textContent = '';
-        try { await cloud.sendCode(email); try { localStorage.setItem('ritmo-email', email); } catch(e) {} stepCode(); }
-        catch(e2) { err.textContent = authMsg(e2); btn.classList.remove('loading'); }
-      };
-      btn.onclick = go; inp.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); go(); } };
-      setTimeout(() => inp.focus(), 350);
-    };
-    const stepCode = () => {
-      const a = authScreen(`<div class="auth-brand">Habit</div>
-        <h1>Revisa tu correo</h1>
-        <p>Te enviamos un código a <b>${esc(email)}</b>. Si no aparece, mira en spam.</p>
-        <div class="field"><label class="lbl" for="au-code">Código</label>
-          <input id="au-code" class="code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]*" maxlength="6" placeholder="······"></div>
-        <div class="auth-err" id="au-err" role="alert"></div>
-        <button class="btn wide" id="au-verify">Entrar</button>
-        <div class="auth-links"><button class="link" id="au-back">Usar otro correo</button><button class="link" id="au-resend" disabled>Reenviar en 30 s</button></div>`);
-      const inp = a.querySelector('#au-code'), btn = a.querySelector('#au-verify'), err = a.querySelector('#au-err'), rs = a.querySelector('#au-resend');
-      let left = 30; const tick = setInterval(() => { left--; rs.textContent = left > 0 ? `Reenviar en ${left} s` : 'Reenviar código'; rs.disabled = left > 0; if (left <= 0) clearInterval(tick); }, 1000);
-      const go = async () => {
-        const code = inp.value.replace(/\D/g, '');
-        if (code.length < 6) { err.textContent = 'El código tiene 6 dígitos.'; inp.focus(); return; }
-        btn.classList.add('loading'); err.textContent = '';
-        try { const u = await cloud.verifyCode(email, code); clearInterval(tick); buzz(12); resolve(u); }
-        catch(e2) { err.textContent = authMsg(e2); btn.classList.remove('loading'); inp.select(); }
-      };
-      inp.oninput = () => { inp.value = inp.value.replace(/\D/g, '').slice(0,6); if (inp.value.length === 6) go(); };
-      btn.onclick = go;
-      a.querySelector('#au-back').onclick = () => { clearInterval(tick); stepEmail(); };
-      rs.onclick = async () => { rs.disabled = true; try { await cloud.sendCode(email); toast('Código reenviado'); left = 30; } catch(e2) { err.textContent = authMsg(e2); rs.disabled = false; } };
-      setTimeout(() => inp.focus(), 350);
-    };
-    stepEmail();
-  });
-}
-async function refreshFriends(){
-  try {
-    const list = await cloud.loadFriends(me.id);
-    list.forEach(f => { normalize(f); withState(f, freezePast); });
-    const changed = JSON.stringify(list) !== JSON.stringify(friends);
-    friends = list;
-    friend = friends.find(f => f.id === ui.friendId) || friends[0] || null;
-    ui.friendId = friend && friend.id;
-    return changed;
-  } catch(e) { console.warn('[ritmo] friends', e); return false; }
-}
-async function acceptPendingInvite(){
-  let code = null; try { code = localStorage.getItem(INVITE_KEY); } catch(e) {}
-  if (!code) return;
-  try {
-    ui.friendId = await cloud.acceptInvite(code);
-    await refreshFriends();
-    if (friend) { if (active().length) ui.tab = 'friend'; setTimeout(() => toast(`Ya estás conectado con ${friendName()}`), 400); }
-  } catch(e) {
-    const m = (e && e.message) || '';
-    if (/too_many_friends/.test(m)) toast('Llegaste al máximo de amigos.');
-    else if (/invite_used|invite_not_found/.test(m)) toast('Ese enlace ya no sirve. Pídele uno nuevo.');
-    else if (!/own_invite/.test(m)) { toast('No se pudo usar la invitación. Inténtalo de nuevo.'); return; }
-  }
-  try { localStorage.removeItem(INVITE_KEY); } catch(e) {}
-}
-async function shareInvite(btn){
-  btn.classList.add('loading');
-  try {
-    const code = await cloud.createInvite();
-    const url = `${location.origin}${location.pathname}?i=${code}`;
-    const text = `${state.profile.name || 'Tu amigo'} te invita a Habit para hacer hábitos juntos.`;
-    if (navigator.share) { try { await navigator.share({title:'Habit', text, url}); } catch(e) { if (e.name !== 'AbortError') throw e; } }
-    else { await navigator.clipboard.writeText(`${text} ${url}`); toast('Enlace copiado. Pégalo en WhatsApp.'); }
-  } catch(e) { toast('No se pudo crear la invitación. Revisa tu internet.'); }
-  btn.classList.remove('loading');
-}
-function setupScreen(){
-  authScreen(`<div class="auth-brand">Habit</div><h1>Falta conectar la base de datos</h1>
-    <p>Copia la URL y la clave pública de tu proyecto de Supabase en <b>config.js</b>. Los pasos están en el README.</p>`);
-}
-async function boot(){
-  const inv = new URLSearchParams(location.search).get('i');
-  if (inv) { try { localStorage.setItem(INVITE_KEY, inv); } catch(e) {} history.replaceState(null, '', location.pathname); }
-  if (!cloud.configured) return setupScreen();
-  me = await cloud.currentUser().catch(() => null);
-  if (!me) { me = await authFlow(); $('auth').hidden = true; }
-  sync = cloud.createSync(me.id, {
-    getState: () => state,
-    photoUploaded: (dataUrl, path) => cloud.rememberPhoto(dataUrl, path),
-    status: setSyncStatus,
-    closedDay: () => {}
-  });
-  const cached = sync.cached();
-  if (cached) { state = normalize(cached); freezePast(); render(); hideSplash(); }
-  try { state = normalize(await sync.load()); }
-  catch(e) {
-    console.warn('[ritmo] load', e);
-    if (!cached) { authScreen('<div class="auth-brand">Habit</div><h1>No pudimos cargar tu día</h1><p>Revisa tu conexión y vuelve a abrir la app.</p>'); return; }
-  }
-  await refreshFriends();
-  await acceptPendingInvite();
-  freezePast(); save(); render(); hideSplash();
-  const poll = async () => { if (!document.hidden && await refreshFriends() && !ui.sheet) render(); };
-  setInterval(poll, 60000);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); else sync.flush(); });
-  window.addEventListener('online', () => sync.flush());
-  window.addEventListener('pagehide', () => sync.flush());
-}
-await boot();
+freezePast(); withState(friend, freezePast); save();
+render();
 })();
 </script>
-</body>
-</html>
+

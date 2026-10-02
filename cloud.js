@@ -1,4 +1,4 @@
-/* Ritmo · conexión con Supabase.
+/* Habit · conexión con Supabase.
    La app trabaja siempre sobre su estado en memoria (como el prototipo) y este
    módulo lo carga, lo guarda en segundo plano y trae los datos del amigo.
    Las reglas importantes (candado de las 4:00, quién ve qué) las aplica la
@@ -227,16 +227,23 @@ export function createSync(uid, hooks) {
   };
 }
 
-/* ---------- amigo ---------- */
-export async function loadFriend(uid) {
-  const { data, error } = await sb.from('friendships').select('friend_id').eq('user_id', uid).maybeSingle();
+/* ---------- amigos ----------
+   Cada amistad es una pareja independiente: traemos el día de cada amigo,
+   en el orden en que se conectaron. */
+export async function loadFriends(uid) {
+  const { data, error } = await sb.from('friendships').select('friend_id, created_at').eq('user_id', uid).order('created_at');
   if (error) throw error;
-  if (!data) return null;
   const since = new Date(Date.now() - 120 * 864e5).toISOString().slice(0, 10);
-  const { profile, state } = await loadUser(data.friend_id, since);
-  state.id = data.friend_id;
-  state.profile.name = (profile && profile.name) || 'Tu amigo';
-  return state;
+  return Promise.all((data || []).map(async r => {
+    const { profile, state } = await loadUser(r.friend_id, since);
+    state.id = r.friend_id;
+    state.profile.name = (profile && profile.name) || 'Tu amigo';
+    return state;
+  }));
+}
+export async function removeFriend(friendId) {
+  const { error } = await sb.rpc('remove_friend', { p_friend: friendId });
+  if (error) throw error;
 }
 export async function createInvite() {
   const code = Array.from(crypto.getRandomValues(new Uint8Array(9)), b => 'abcdefghjkmnpqrstuvwxyz23456789'[b % 31]).join('');

@@ -1,4 +1,4 @@
--- Ritmo · esquema de base de datos para Supabase
+-- Habit · esquema de base de datos para Supabase
 -- Pégalo completo en Supabase → SQL Editor → New query → Run.
 -- Se puede ejecutar más de una vez sin romper nada.
 
@@ -41,13 +41,25 @@ create table if not exists public.frozen_days (
   primary key (user_id, day)
 );
 
--- Amistad: una fila por persona. La clave primaria garantiza un solo amigo por cuenta.
+-- Amistad: siempre de a dos. Cada pareja son dos filas (una por persona).
+-- Puedes tener varios amigos, pero cada amistad es independiente:
+-- tus amigos ven tu día, no el de tus otros amigos.
 create table if not exists public.friendships (
-  user_id    uuid primary key references auth.users on delete cascade,
+  user_id    uuid not null references auth.users on delete cascade,
   friend_id  uuid not null references auth.users on delete cascade,
   created_at timestamptz not null default now(),
+  primary key (user_id, friend_id),
   check (user_id <> friend_id)
 );
+-- Si ya habías creado la versión de un solo amigo (clave = user_id), pásala a parejas.
+do $$ begin
+  if not exists (select 1 from information_schema.key_column_usage
+                 where table_schema = 'public' and table_name = 'friendships'
+                   and constraint_name = 'friendships_pkey' and column_name = 'friend_id') then
+    alter table public.friendships drop constraint if exists friendships_pkey;
+    alter table public.friendships add primary key (user_id, friend_id);
+  end if;
+end $$;
 
 -- Invitaciones: el enlace que mandas por WhatsApp.
 create table if not exists public.invites (
@@ -71,7 +83,8 @@ returns boolean language sql stable security definer set search_path = public as
   select exists (select 1 from friendships where user_id = auth.uid() and friend_id = owner)
 $$;
 
--- Aceptar una invitación: conecta a las dos personas si ninguna tiene amigo todavía.
+-- Aceptar una invitación: conecta a las dos personas como pareja de amigos.
+-- Cada enlace sirve una sola vez; para otro amigo se crea otro enlace.
 create or replace function public.accept_invite(p_code text)
 returns uuid language plpgsql security definer set search_path = public as $$
 declare inv invites; me uuid := auth.uid();
@@ -82,11 +95,20 @@ begin
   if inv.inviter = me then raise exception 'own_invite'; end if;
   if exists (select 1 from friendships where user_id = me and friend_id = inv.inviter) then return inv.inviter; end if;
   if inv.accepted_by is not null then raise exception 'invite_used'; end if;
-  if exists (select 1 from friendships where user_id in (me, inv.inviter)) then raise exception 'already_has_friend'; end if;
+  if (select count(*) from friendships where user_id = me) >= 20
+     or (select count(*) from friendships where user_id = inv.inviter) >= 20 then raise exception 'too_many_friends'; end if;
   insert into friendships (user_id, friend_id) values (me, inv.inviter), (inv.inviter, me);
   update invites set accepted_by = me where code = p_code;
   return inv.inviter;
 end $$;
+
+-- Dejar de ser amigos: borra la pareja en los dos sentidos. Los demás amigos no cambian.
+create or replace function public.remove_friend(p_friend uuid)
+returns void language sql security definer set search_path = public as $$
+  delete from friendships
+  where (user_id = auth.uid() and friend_id = p_friend)
+     or (user_id = p_friend and friend_id = auth.uid())
+$$;
 
 -- Valida tz para que nadie pueda mover su "hoy" con una zona inventada.
 create or replace function public.check_tz() returns trigger language plpgsql as $$
@@ -113,7 +135,7 @@ alter table public.frozen_days enable row level security;
 alter table public.friendships enable row level security;
 alter table public.invites     enable row level security;
 
--- Leer: lo tuyo y lo de tu amigo (incluidas notas, como acordamos).
+-- Leer: lo tuyo y lo de tus amigos (incluidas notas, como acordamos).
 drop policy if exists "read own or friend" on public.profiles;
 create policy "read own or friend" on public.profiles for select using (id = auth.uid() or public.is_friend(id));
 drop policy if exists "read own or friend" on public.habits;
@@ -151,7 +173,7 @@ drop policy if exists "read own" on public.invites;
 create policy "read own" on public.invites for select using (inviter = auth.uid());
 
 -- ───────────── Fotos (Storage) ─────────────
--- Carpeta por persona: <user_id>/<día>/<archivo>.jpg. Privado: solo tú y tu amigo.
+-- Carpeta por persona: <user_id>/<día>/<archivo>.jpg. Privado: solo tú y tus amigos.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('photos', 'photos', false, 2097152, array['image/jpeg','image/png','image/webp'])
 on conflict (id) do nothing;
