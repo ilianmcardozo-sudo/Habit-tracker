@@ -57,7 +57,8 @@ MODELO_CLAUDE_CODE = "sonnet"
 # Solo se usa si NO tienes Claude Code y pones una clave de API en clave_anthropic.txt
 MODELO = "claude-opus-5-5"
 
-# Guardar cada palabra consultada en historial.md (para repasar después)
+# Guardar cada consulta en palabras.txt (lista), historial.md (explicaciones)
+# y anki.txt (tarjetas para importar en Anki)
 GUARDAR_HISTORIAL = True
 
 # ---------------------------------------------------------------------------
@@ -65,6 +66,8 @@ GUARDAR_HISTORIAL = True
 CARPETA = os.path.dirname(os.path.abspath(__file__))
 ARCHIVO_CLAVE = os.path.join(CARPETA, "clave_anthropic.txt")
 ARCHIVO_HISTORIAL = os.path.join(CARPETA, "historial.md")
+ARCHIVO_PALABRAS = os.path.join(CARPETA, "palabras.txt")
+ARCHIVO_ANKI = os.path.join(CARPETA, "anki.txt")
 
 INSTRUCCIONES_CLAUDE = """Eres un profesor de pronunciación de inglés americano (General American) \
 para hispanohablantes. El alumno habla español y quiere imitar los sonidos lo mejor posible.
@@ -84,7 +87,10 @@ y compáralo con el sonido español más cercano.
 schwa, flap T) y qué palabras llevan el acento de la frase.
 7. TRUCO para practicar: un ejercicio corto (pares mínimos, repetir algo, etc.).
 
-Si el texto no es inglés o no tiene sentido, dilo y sugiere qué pudo haber querido seleccionar."""
+Si el texto no es inglés o no tiene sentido, dilo y sugiere qué pudo haber querido seleccionar.
+
+Al final, en una línea aparte y sin nada después, escribe exactamente este formato (una sola línea):
+ANKI: <IPA americano> | <cómo suena a la española> | <el consejo más importante, en una frase corta>"""
 
 
 # ---------------------------------------------------------------------------
@@ -273,6 +279,56 @@ def explicar_pronunciacion(frase):
 
 
 # ---------------------------------------------------------------------------
+# Historial y Anki
+# ---------------------------------------------------------------------------
+
+def separar_linea_anki(explicacion):
+    """Quita la línea 'ANKI: ...' del texto y devuelve (texto_limpio, [ipa, aprox, consejo] o None)."""
+    lineas = explicacion.rstrip().splitlines()
+    for i in range(len(lineas) - 1, -1, -1):
+        linea = lineas[i].strip().strip("*`").strip()
+        if linea.upper().startswith("ANKI:"):
+            partes = [x.strip() for x in linea[5:].split("|")]
+            partes = (partes + ["", "", ""])[:3]
+            limpio = "\n".join(lineas[:i] + lineas[i + 1:]).strip()
+            return limpio, partes
+    return explicacion, None
+
+
+def _html(texto):
+    texto = texto.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    return texto.replace("\t", " ").replace("\r", "").replace("\n", "<br>")
+
+
+def guardar_en_registros(frase, explicacion, datos_anki):
+    fecha = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    # Lista simple de palabras
+    with open(ARCHIVO_PALABRAS, "a", encoding="utf-8") as f:
+        f.write(f"{fecha}\t{frase}\n")
+
+    # Historial completo
+    with open(ARCHIVO_HISTORIAL, "a", encoding="utf-8") as f:
+        f.write(f"\n## {frase}  ({fecha})\n\n{explicacion}\n")
+
+    # Tarjetas para Anki (sin repetir palabras)
+    if not datos_anki:
+        return
+    nuevo = not os.path.isfile(ARCHIVO_ANKI)
+    if not nuevo:
+        with open(ARCHIVO_ANKI, encoding="utf-8") as f:
+            ya = {l.split("\t", 1)[0].strip().lower() for l in f if l.strip() and not l.startswith("#")}
+        if _html(frase).lower() in ya:
+            return
+    ipa, aprox, consejo = datos_anki
+    reverso = f"<b>{_html(ipa)}</b><br>{_html(aprox)}<br><br><i>{_html(consejo)}</i>"
+    with open(ARCHIVO_ANKI, "a", encoding="utf-8") as f:
+        if nuevo:
+            f.write("#separator:tab\n#html:true\n#columns:Frente\tReverso\tExplicación\n")
+        f.write(f"{_html(frase)}\t{reverso}\t{_html(explicacion)}\n")
+
+
+# ---------------------------------------------------------------------------
 # Interfaz
 # ---------------------------------------------------------------------------
 
@@ -434,18 +490,19 @@ class App:
         ventana = VentanaPronunciacion(self.raiz, texto)
 
         def trabajo():
+            ok = True
             try:
                 explicacion = explicar_pronunciacion(texto)
             except Exception as e:
+                ok = False
                 explicacion = f"No pude obtener la explicación de Claude:\n{e}"
+            explicacion, datos_anki = separar_linea_anki(explicacion)
             self.eventos.put(("explicacion", ventana, explicacion))
             if GUARDAR_HISTORIAL:
                 try:
-                    with open(ARCHIVO_HISTORIAL, "a", encoding="utf-8") as f:
-                        fecha = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-                        f.write(f"\n## {texto}  ({fecha})\n\n{explicacion}\n")
-                except OSError:
-                    pass
+                    guardar_en_registros(texto, explicacion, datos_anki if ok else None)
+                except OSError as e:
+                    print(f"No pude guardar el historial: {e}")
 
         threading.Thread(target=trabajo, daemon=True).start()
 

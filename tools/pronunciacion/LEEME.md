@@ -6,7 +6,10 @@ Presionas **Ctrl + Alt + P**, la pantalla se congela como con `Win + Shift + S`,
    - **YouTube**: busca la **primera palabra** dentro del canal *English with Collins Dictionary*, versión **American English**.
    - **Google**: `how to pronounce <frase> American English`. Google suele mostrar su widget de pronunciación con audio.
 2. Aparece una ventana con la explicación de la **frase completa** para hispanohablantes: IPA americano, cómo suena "a la española", qué hacer con la boca en los sonidos que no existen en español, errores típicos y un ejercicio.
-3. Cada consulta se guarda en `historial.md` para repasar.
+3. Cada consulta se guarda en tres archivos dentro de esta carpeta:
+   - `palabras.txt`: lista simple de todo lo que buscaste, con fecha.
+   - `historial.md`: las explicaciones completas.
+   - `anki.txt`: tarjetas listas para importar en Anki, sin palabras repetidas.
 
 Sirve con cualquier cosa en pantalla: videos (la imagen se congela al presionar el atajo), PDFs, páginas web o imágenes.
 
@@ -31,6 +34,16 @@ Sirve con cualquier cosa en pantalla: videos (la imagen se congela al presionar 
 
 1. Presiona `Win + R`, escribe `shell:startup` y presiona Enter.
 2. Arrastra ahí `iniciar_oculto.bat` **con clic derecho** y elige *Crear acceso directo aquí*.
+
+## Pasar las palabras a Anki
+
+1. Abre Anki y ve a **Archivo → Importar**.
+2. Elige `anki.txt` de esta carpeta.
+3. Elige el **mazo** donde quieres las tarjetas y el tipo de nota **Básico**. Las columnas ya vienen nombradas: Frente, Reverso y Explicación. Si el tipo de nota solo tiene dos campos, la explicación completa se descarta y la tarjeta queda con la palabra y la pronunciación.
+4. Presiona **Importar**.
+
+Puedes importar el mismo archivo varias veces: Anki detecta las tarjetas que ya tienes y no las duplica.
+Para empezar de cero, borra `anki.txt` y se crea uno nuevo en la siguiente búsqueda.
 
 ## Ajustes
 
