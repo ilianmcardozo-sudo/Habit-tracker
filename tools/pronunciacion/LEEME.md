@@ -40,7 +40,7 @@ Al inicio de `pronunciar.py`, en la sección **CONFIGURACIÓN**, puedes cambiar:
 |---|---|
 | `ATAJO` | La combinación de teclas (`"ctrl+alt+p"`, `"f8"`, …) |
 | `CANAL_YOUTUBE` | El @ del canal. **Si YouTube dice que el canal no existe**, abre el canal de Collins, copia lo que va después de `youtube.com/` y pégalo aquí |
-| `SUFIJO_YOUTUBE` | Texto extra para la búsqueda en YouTube (vacío = solo la palabra) |
+| `SUFIJO_YOUTUBE` | Lo que se agrega a la búsqueda para quedarse con la versión americana |
 | `MODELO_CLAUDE_CODE` | `"sonnet"` (rápido) u `"opus"` (más detallado, más lento) |
 | `ABRIR_GOOGLE` | `False` para no abrir Google |
 | `GUARDAR_HISTORIAL` | `False` para no guardar `historial.md` |

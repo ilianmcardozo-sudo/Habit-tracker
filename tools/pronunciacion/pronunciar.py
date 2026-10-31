@@ -42,11 +42,10 @@ ATAJO = "ctrl+alt+p"
 # con @) y pégalo aquí.
 CANAL_YOUTUBE = "@englishwithcollinsdictionary"
 
-# Texto extra para la búsqueda en YouTube. Vacío = buscar solo la palabra
-# (aparecen la versión británica y la americana; elige la que dice
-# "American English"). Si pones "American English", muchas palabras no
-# dan ningún resultado.
-SUFIJO_YOUTUBE = ""
+# Qué se agrega a la búsqueda en YouTube para quedarse con la versión
+# americana (los videos de Collins dicen "...in American English").
+# Si no sale nada, es que Collins no tiene esa palabra.
+SUFIJO_YOUTUBE = "American English"
 
 # Abrir también la búsqueda de Google
 ABRIR_GOOGLE = True
