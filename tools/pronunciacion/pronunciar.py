@@ -49,7 +49,11 @@ SUFIJO_YOUTUBE = "American English"
 # Abrir también la búsqueda de Google
 ABRIR_GOOGLE = True
 
-# Modelo de Claude que explica la pronunciación
+# Modelo que explica la pronunciación usando Claude Code (tu suscripción).
+# "sonnet" es rápido y explica muy bien; "opus" es más detallado pero más lento.
+MODELO_CLAUDE_CODE = "sonnet"
+
+# Solo se usa si NO tienes Claude Code y pones una clave de API en clave_anthropic.txt
 MODELO = "claude-opus-5-5"
 
 # Guardar cada palabra consultada en historial.md (para repasar después)
@@ -176,18 +180,73 @@ def leer_clave():
     return clave or None
 
 
+def buscar_claude_code():
+    ruta = shutil.which("claude")
+    if ruta:
+        return ruta
+    for c in (
+        os.path.expanduser(r"~\.local\bin\claude.exe"),
+        os.path.join(os.environ.get("APPDATA", ""), "npm", "claude.cmd"),
+    ):
+        if os.path.isfile(c):
+            return c
+    return None
+
+
+def explicar_con_claude_code(claude, frase):
+    """Usa Claude Code instalado en la PC, con la sesión de tu suscripción de Claude."""
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        archivo_instrucciones = os.path.join(tmp, "instrucciones.txt")
+        with open(archivo_instrucciones, "w", encoding="utf-8") as f:
+            f.write(INSTRUCCIONES_CLAUDE)
+
+        entorno = dict(os.environ)
+        # Si hubiera una clave de API en el sistema, Claude Code la usaría y cobraría
+        # aparte. La quitamos para que use siempre tu suscripción.
+        entorno.pop("ANTHROPIC_API_KEY", None)
+
+        resultado = subprocess.run(
+            [
+                claude, "-p",
+                "--model", MODELO_CLAUDE_CODE,
+                "--tools", "",
+                "--no-session-persistence",
+                "--system-prompt-file", archivo_instrucciones,
+            ],
+            input=f'Texto seleccionado en pantalla: "{frase}"',
+            capture_output=True, text=True, encoding="utf-8", errors="replace",
+            cwd=tmp, env=entorno, timeout=180,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        )
+    if resultado.returncode != 0:
+        detalle = (resultado.stderr or resultado.stdout).strip()
+        return (
+            "Claude Code dio un error.\n\n"
+            "Si dice que no has iniciado sesión: abre una ventana de cmd, escribe  claude  "
+            "y sigue los pasos para entrar con tu cuenta de Claude.\n\n"
+            f"Detalle: {detalle}"
+        )
+    return resultado.stdout.strip() or "(Respuesta vacía, inténtalo de nuevo.)"
+
+
 def explicar_pronunciacion(frase):
-    import anthropic
+    claude = buscar_claude_code()
+    if claude:
+        return explicar_con_claude_code(claude, frase)
 
     clave = leer_clave()
     if not clave:
         return (
-            "No hay clave de Anthropic configurada, así que no puedo darte la explicación.\n\n"
-            "Crea un archivo llamado clave_anthropic.txt en esta carpeta:\n"
-            f"{CARPETA}\n"
-            "y pega dentro tu clave (empieza con sk-ant-). La consigues en "
-            "https://console.anthropic.com/settings/keys"
+            "No encontré Claude Code en esta PC, así que no puedo darte la explicación.\n\n"
+            "Para instalarlo, abre PowerShell y pega:\n"
+            "    irm https://claude.ai/install.ps1 | iex\n"
+            "Después abre una ventana de cmd, escribe  claude  e inicia sesión con tu cuenta.\n"
+            "Luego cierra y vuelve a abrir iniciar.bat."
         )
+
+    import anthropic
 
     client = anthropic.Anthropic(api_key=clave)
     peticion = dict(

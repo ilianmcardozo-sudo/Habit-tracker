@@ -14,10 +14,11 @@ Sirve con cualquier cosa en pantalla: videos (la imagen se congela al presionar 
 
 1. **Instala Python** desde https://www.python.org/downloads/ y marca la casilla **"Add python.exe to PATH"** durante la instalación.
 2. Haz doble clic en **`instalar.bat`**.
-3. **Clave de Anthropic** (para la explicación de pronunciación):
-   - Créala en https://console.anthropic.com/settings/keys (cada consulta cuesta una fracción de centavo).
-   - Crea en esta carpeta un archivo llamado `clave_anthropic.txt` y pega la clave dentro (empieza con `sk-ant-`).
-   - Sin clave, las búsquedas de YouTube y Google siguen funcionando.
+3. **Claude Code** (para la explicación de pronunciación, usa tu suscripción de Claude, sin pagos extra):
+   - Comprueba si lo tienes: abre `cmd` y escribe `claude --version`.
+   - Si no lo tienes, abre PowerShell y pega `irm https://claude.ai/install.ps1 | iex`.
+   - Abre `cmd`, escribe `claude` e inicia sesión con tu cuenta de Claude (solo la primera vez).
+   - Sin Claude Code, las búsquedas de YouTube y Google siguen funcionando.
 4. **Idioma de OCR**: normalmente ya está instalado. Si te aparece un error de OCR, ve a *Configuración → Hora e idioma → Idioma → Agregar un idioma → English (United States)*.
 
 ## Uso
@@ -40,6 +41,7 @@ Al inicio de `pronunciar.py`, en la sección **CONFIGURACIÓN**, puedes cambiar:
 | `ATAJO` | La combinación de teclas (`"ctrl+alt+p"`, `"f8"`, …) |
 | `CANAL_YOUTUBE` | El @ del canal. **Si YouTube dice que el canal no existe**, abre el canal de Collins, copia lo que va después de `youtube.com/` y pégalo aquí |
 | `SUFIJO_YOUTUBE` | Lo que se agrega a la búsqueda para quedarse con la versión americana |
+| `MODELO_CLAUDE_CODE` | `"sonnet"` (rápido) u `"opus"` (más detallado, más lento) |
 | `ABRIR_GOOGLE` | `False` para no abrir Google |
 | `GUARDAR_HISTORIAL` | `False` para no guardar `historial.md` |
 
