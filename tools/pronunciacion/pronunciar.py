@@ -42,9 +42,11 @@ ATAJO = "ctrl+alt+p"
 # con @) y pégalo aquí.
 CANAL_YOUTUBE = "@englishwithcollinsdictionary"
 
-# Qué se agrega a la búsqueda en YouTube para quedarse con la versión
-# americana (los videos de Collins dicen "...in American English").
-SUFIJO_YOUTUBE = "American English"
+# Texto extra para la búsqueda en YouTube. Vacío = buscar solo la palabra
+# (aparecen la versión británica y la americana; elige la que dice
+# "American English"). Si pones "American English", muchas palabras no
+# dan ningún resultado.
+SUFIJO_YOUTUBE = ""
 
 # Abrir también la búsqueda de Google
 ABRIR_GOOGLE = True
@@ -421,7 +423,7 @@ class App:
 
         urls = [
             f"https://www.youtube.com/{CANAL_YOUTUBE}/search?query="
-            + urllib.parse.quote(f"{primera} {SUFIJO_YOUTUBE}")
+            + urllib.parse.quote(f"{primera} {SUFIJO_YOUTUBE}".strip())
         ]
         if ABRIR_GOOGLE:
             urls.append(
