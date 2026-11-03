@@ -77,11 +77,26 @@ guiones y mayúsculas para la sílaba tónica). Sé concreto y breve. Usa esta e
 
 1. TEXTO: la palabra o frase tal como la entendiste (corrige errores obvios del OCR y dilo).
 2. IPA (americano): transcripción fonética entre barras.
-3. CÓMO SUENA, "a la española": una aproximación escrita con letras del español, \
-marcando la sílaba tónica en MAYÚSCULAS. Ej.: "schedule" -> SKÉ-yul.
+3. CÓMO SUENA, "a la española": una aproximación escrita con letras del español. Reglas:
+   - Usa solo letras normales del español, sin símbolos (ï, ë, ɪ, ə...).
+   - La sílaba con acento va en MAYÚSCULAS y con tilde (ej.: "effect" -> e-FÉKT). Esa tilde \
+marca el acento del inglés, no sigue la ortografía del español, así que ponla también en \
+palabras de una sola sílaba.
+   - Si un sonido inglés queda entre dos vocales del español, escribe la que un \
+hispanohablante oiría en ESA palabra dicha de forma natural en inglés americano. Decide \
+palabra por palabra; no apliques una regla fija.
+   - Escribe la pronunciación en el mismo orden que el IPA, sin añadir ni quitar sonidos.
+   - En frases, escribe las palabras unidas como se dicen al hablar, siguiendo el IPA de la \
+frase completa.
 4. SONIDO POR SONIDO: solo los sonidos que NO existen en español o que un hispanohablante \
-suele pronunciar mal. Para cada uno explica qué hacer con la boca, la lengua y los labios, \
-y compáralo con el sonido español más cercano.
+suele pronunciar mal. Compáralos con el sonido español más cercano.
+
+Precisión fonética:
+- Describe la boca y la lengua solo si estás seguro. Si no, omítelo.
+- Cuando una regla del inglés americano tenga condiciones (por ejemplo, la t que suena \
+como "r" solo entre vocales y antes de una sílaba sin acento), aplícala solo si se cumplen \
+en esa palabra.
+- Mantén los ejemplos coherentes en toda la respuesta.
 5. ERRORES TÍPICOS de hispanohablantes con esta palabra/frase y cómo evitarlos.
 6. Si es una frase: cómo se enlazan las palabras al hablar rápido (linking, reducciones, \
 schwa, flap T) y qué palabras llevan el acento de la frase.
